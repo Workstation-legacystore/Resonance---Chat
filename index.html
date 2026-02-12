@@ -1,197 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RESONANCE /// EVENT HORIZON</title>
+    <title>RESONANCE / UNIT-5495</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&family=JetBrains+Mono:wght@300;500&display=swap" rel="stylesheet">
 
     <style>
-        /* === GLOBAL RESET & VARIABLES === */
         :root {
-            --neon-primary: #00f3ff;
-            --neon-sec: #bc13fe;
-            --neon-danger: #ff003c;
-            --glass-bg: rgba(8, 8, 12, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --font-ui: 'Inter', sans-serif;
-            --font-cyber: 'Orbitron', sans-serif;
+            --bg: #0a0a0b;
+            --accent: #ffffff;
+            --secondary: #1a1a1c;
+            --border: rgba(255, 255, 255, 0.08);
+            --font-main: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
         }
 
-        * { box-sizing: border-box; outline: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; outline: none; }
 
         body {
             margin: 0; height: 100vh;
-            background: #000;
-            overflow: hidden;
-            font-family: var(--font-ui);
-            color: white;
+            background: var(--bg);
+            color: var(--accent);
+            font-family: var(--font-main);
             display: flex; justify-content: center; align-items: center;
         }
 
-        /* === BACKGROUND SYSTEM (CANVAS) === */
-        #space-canvas {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
+        /* Фоновый эффект: тонкая сетка как в чертежах */
+        body::before {
+            content: ""; position: absolute; width: 100%; height: 100%;
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 32px 32px; z-index: -1; opacity: 0.5;
         }
 
-        /* === MAIN INTERFACE CONTAINER === */
-        #interface {
-            position: relative; z-index: 10;
-            width: 100%; max-width: 550px; height: 95vh;
+        #app {
+            width: 100%; max-width: 500px; height: 90vh;
+            border: 1px solid var(--border);
             display: flex; flex-direction: column;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
-            overflow: hidden;
-            transition: 0.5s;
-            animation: introPop 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+            background: rgba(10, 10, 11, 0.8);
+            backdrop-filter: blur(40px);
         }
 
-        /* === LOGIN OVERLAY (The Gate) === */
-        #gate-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 8, 0.95);
-            z-index: 100;
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            transition: transform 0.6s cubic-bezier(0.8, 0, 0.2, 1);
+        /* ЭКРАН ВХОДА */
+        #login-gate {
+            position: absolute; inset: 0; background: var(--bg);
+            z-index: 100; display: flex; flex-direction: column;
+            justify-content: center; padding: 40px;
+            transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .cyber-logo {
-            font-family: var(--font-cyber);
-            font-size: 3rem; font-weight: 900;
-            background: linear-gradient(135deg, #fff 30%, var(--neon-primary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
+        .unit-label { font-family: var(--font-code); font-size: 10px; letter-spacing: 4px; opacity: 0.4; margin-bottom: 8px; }
+        .gate-title { font-size: 32px; font-weight: 300; letter-spacing: -1px; margin-bottom: 40px; }
+
+        .prime-input {
+            background: transparent; border: none;
+            border-bottom: 1px solid var(--border);
+            color: white; font-family: var(--font-code);
+            padding: 12px 0; font-size: 16px; width: 100%;
+            margin-bottom: 20px; transition: 0.3s;
         }
 
-        .input-wrapper {
-            position: relative; width: 80%; max-width: 300px; margin-top: 40px;
+        .prime-input:focus { border-color: white; }
+
+        .prime-btn {
+            background: white; color: black; border: none;
+            padding: 15px; font-weight: 500; font-size: 12px;
+            text-transform: uppercase; letter-spacing: 2px;
+            cursor: pointer; margin-top: 10px;
         }
 
-        .gate-input {
-            width: 100%; padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid #333;
-            color: var(--neon-primary);
-            font-family: var(--font-cyber);
-            text-align: center; font-size: 1.2rem;
-            transition: 0.3s; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
-        }
-
-        .gate-input:focus {
-            border-color: var(--neon-primary);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
-            background: rgba(0, 243, 255, 0.02);
-        }
-
-        .gate-btn {
-            margin-top: 20px;
-            padding: 15px 40px;
-            background: var(--neon-primary);
-            color: #000; font-weight: 900;
-            border: none; cursor: pointer;
-            font-family: var(--font-cyber);
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            clip-path: polygon(20px 0, 100% 0, 100% 100%, 0 100%, 0 20px);
-            transition: 0.2s;
-        }
-        
-        .gate-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--neon-primary); }
-
-        /* === CHAT UI === */
+        /* ИНТЕРФЕЙС ЧАТА */
         header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: baseline;
         }
 
-        .brand-sm { font-family: var(--font-cyber); font-weight: 700; letter-spacing: 1px; }
-        .status-dot { width: 8px; height: 8px; background: #0f0; border-radius: 50%; box-shadow: 0 0 10px #0f0; display: inline-block; margin-right: 5px; }
-
-        #chat-stream {
+        #messages {
             flex: 1; overflow-y: auto; padding: 20px;
-            display: flex; flex-direction: column; gap: 15px;
-            scroll-behavior: smooth;
+            display: flex; flex-direction: column; gap: 20px;
         }
 
-        .msg-row { display: flex; flex-direction: column; opacity: 0; animation: slideUp 0.3s forwards; }
-        
-        .bubble {
-            max-width: 85%; padding: 12px 18px;
-            font-size: 15px; line-height: 1.5;
-            position: relative;
+        .msg { max-width: 90%; animation: fadeIn 0.4s ease; }
+        .msg.mine { align-self: flex-end; text-align: right; }
+
+        .sender { font-family: var(--font-code); font-size: 9px; opacity: 0.4; text-transform: uppercase; margin-bottom: 5px; display: block; }
+        .text { font-size: 14px; font-weight: 300; line-height: 1.6; }
+
+        /* Стиль админа - тонкое подчеркивание вместо неона */
+        .msg.admin .text { border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 4px; }
+
+        .input-box {
+            padding: 20px; border-top: 1px solid var(--border);
+            display: flex; gap: 15px;
         }
 
-        /* Others */
-        .left .bubble {
-            background: rgba(255,255,255,0.05);
-            border-left: 2px solid rgba(255,255,255,0.2);
-            border-radius: 0 15px 15px 15px;
-        }
+        .del-link { font-family: var(--font-code); font-size: 9px; color: #ff4444; cursor: pointer; margin-left: 10px; text-decoration: none; }
 
-        /* Me */
-        .right { align-items: flex-end; }
-        .right .bubble {
-            background: rgba(0, 243, 255, 0.1);
-            border-right: 2px solid var(--neon-primary);
-            color: #fff;
-            border-radius: 15px 0 15px 15px;
-            text-align: right;
-        }
-
-        /* ADMIN GOD MODE */
-        .admin-mode .bubble {
-            background: linear-gradient(90deg, rgba(188, 19, 254, 0.1), rgba(0,0,0,0));
-            border: 1px solid var(--neon-sec);
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
-            color: #fff; text-shadow: 0 0 5px var(--neon-sec);
-        }
-
-        .meta { font-size: 10px; opacity: 0.5; margin-top: 5px; font-family: var(--font-cyber); }
-        .del-x { color: var(--neon-danger); font-weight: bold; cursor: pointer; margin-left: 10px; font-size: 12px; }
-
-        /* Input Area */
-        .control-bar {
-            padding: 20px;
-            background: rgba(0,0,0,0.3);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            display: flex; gap: 10px;
-        }
-
-        .cyber-bar {
-            flex: 1; background: transparent; border: none;
-            border-bottom: 2px solid #333;
-            color: white; padding: 10px; font-family: var(--font-ui);
-            transition: 0.3s;
-        }
-        .cyber-bar:focus { border-color: var(--neon-primary); }
-
-        .send-btn {
-            background: transparent; color: var(--neon-primary);
-            border: 1px solid var(--neon-primary);
-            width: 40px; height: 40px; border-radius: 50%;
-            cursor: pointer; transition: 0.3s;
-            display: flex; justify-content: center; align-items: center;
-        }
-        .send-btn:hover { background: var(--neon-primary); color: #000; box-shadow: 0 0 20px var(--neon-primary); }
-
-        /* Animations */
-        @keyframes introPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: #333; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -199,206 +105,99 @@
 </head>
 <body>
 
-    <canvas id="space-canvas"></canvas>
-
-    <div id="interface">
-        
-        <div id="gate-layer">
-            <div class="cyber-logo">RESONANCE</div>
-            <div style="font-size: 10px; letter-spacing: 5px; opacity: 0.7;">EVENT HORIZON vX</div>
+    <div id="app">
+        <div id="login-gate">
+            <div class="unit-label">SYSTEM IDENTIFICATION</div>
+            <div class="gate-title">Resonance</div>
             
-            <div class="input-wrapper">
-                <input type="text" id="auth-nick" class="gate-input" placeholder="IDENTITY" autocomplete="off">
-            </div>
-            <div class="input-wrapper" id="pass-wrapper" style="display:none; margin-top:10px;">
-                <input type="password" id="auth-pass" class="gate-input" placeholder="ACCESS CODE" style="border-color: var(--neon-sec); color: var(--neon-sec);">
-            </div>
-
-            <button class="gate-btn" onclick="App.login()">INITIALIZE</button>
+            <input type="text" id="nick" class="prime-input" placeholder="USERNAME" autocomplete="off">
+            <input type="password" id="pass" class="prime-input" placeholder="ROOT_KEY" style="display:none">
+            
+            <button class="prime-btn" onclick="Core.auth()">Connect</button>
         </div>
 
         <header>
-            <div>
-                <div class="status-dot"></div>
-                <span class="brand-sm">LIVE FEED</span>
-            </div>
-            <div id="user-badge" style="font-size: 12px; font-weight: bold;">GUEST</div>
+            <span style="font-weight: 500; font-size: 14px;">UNIT-5495</span>
+            <span id="user-info" style="font-family: var(--font-code); font-size: 10px; opacity: 0.5;">DISCONNECTED</span>
         </header>
 
-        <div id="chat-stream"></div>
+        <div id="messages"></div>
 
-        <div class="control-bar">
-            <input type="text" id="msg-input" class="cyber-bar" placeholder="Broadcast message...">
-            <button class="send-btn" onclick="App.send()">➤</button>
+        <div class="input-box">
+            <input type="text" id="msg-input" class="prime-input" style="margin:0; font-size: 13px;" placeholder="Input signal...">
+            <button onclick="Core.send()" class="prime-btn" style="padding: 0 20px; margin: 0;">&rarr;</button>
         </div>
     </div>
 
     <script>
-        /**
-         * RESONANCE CORE [MAXIMALISM BUILD]
-         * By Workstation5495
-         */
-
-        // 1. STARFIELD ANIMATION ENGINE
-        const canvas = document.getElementById('space-canvas');
-        const ctx = canvas.getContext('2d');
-        let stars = [];
-        
-        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-        window.addEventListener('resize', resize);
-        resize();
-
-        class Star {
-            constructor() {
-                this.reset();
-            }
-            reset() {
-                this.x = (Math.random() - 0.5) * canvas.width * 2;
-                this.y = (Math.random() - 0.5) * canvas.height * 2;
-                this.z = Math.random() * canvas.width;
-                this.pz = this.z;
-            }
-            update() {
-                this.z -= 10; // Speed
-                if(this.z < 1) { this.reset(); this.z = canvas.width; this.pz = this.z; }
-            }
-            draw() {
-                const sx = (this.x / this.z) * canvas.width + canvas.width/2;
-                const sy = (this.y / this.z) * canvas.height + canvas.height/2;
-                const r = (canvas.width - this.z) / canvas.width * 3;
-                
-                ctx.beginPath();
-                ctx.fillStyle = "white";
-                ctx.arc(sx, sy, r, 0, Math.PI*2);
-                ctx.fill();
-            }
-        }
-
-        for(let i=0; i<300; i++) stars.push(new Star());
-
-        function animate() {
-            ctx.fillStyle = "black";
-            ctx.fillRect(0,0,canvas.width, canvas.height);
-            stars.forEach(s => { s.update(); s.draw(); });
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-
-        // 2. APP LOGIC
         const CONFIG = {
             apiKey: "BOPE0sictEq_0Ui_1jjpvdeN2PSOfnQ-U2oNWAKtZFHbsIoHXHxMiO6bXoGSI4XZcWuYTPrrurqL793BJ-OqncA",
             databaseURL: "https://resonance-chat-5495-default-rtdb.firebaseio.com",
             projectId: "resonance-chat-5495",
-            appId: "1:909712050521:web:your_app_id"
+            admin: "Workstation5495",
+            pass: "5495" // <--- ТВОЙ ПАРОЛЬ ТУТ
         };
 
-        const ADMIN_CFG = {
-            nick: "Workstation5495",
-            pass: "admin", // <--- ПОМЕНЯЙ ПАРОЛЬ НА СВОЙ!
-        };
+        const Core = {
+            user: "", isAdmin: false,
 
-        const App = {
-            db: null,
-            user: null,
-            isAdmin: false,
-
-            init: function() {
+            init() {
                 firebase.initializeApp(CONFIG);
                 this.db = firebase.database();
                 
-                // Admin Trigger
-                document.getElementById('auth-nick').addEventListener('input', (e) => {
-                    if(e.target.value === ADMIN_CFG.nick) {
-                        document.getElementById('pass-wrapper').style.display = 'block';
-                    }
-                });
-
-                // Enter Key listeners
-                document.getElementById('msg-input').onkeypress = (e) => { if(e.key === 'Enter') this.send(); };
-                document.getElementById('auth-pass').onkeypress = (e) => { if(e.key === 'Enter') this.login(); };
+                document.getElementById('nick').oninput = (e) => {
+                    document.getElementById('pass').style.display = (e.target.value === CONFIG.admin) ? "block" : "none";
+                };
             },
 
-            login: function() {
-                const nick = document.getElementById('auth-nick').value.trim();
-                if(!nick) return;
+            auth() {
+                const n = document.getElementById('nick').value.trim();
+                if(!n) return;
 
-                if(nick === ADMIN_CFG.nick) {
-                    const pass = document.getElementById('auth-pass').value;
-                    if(pass === ADMIN_CFG.pass) {
+                if(n === CONFIG.admin) {
+                    if(document.getElementById('pass').value === CONFIG.pass) {
                         this.isAdmin = true;
-                        this.enter(nick);
                     } else {
-                        alert("ACCESS DENIED");
-                        document.getElementById('auth-nick').value = "";
-                        document.getElementById('pass-wrapper').style.display = 'none';
+                        return alert("ACCESS DENIED");
                     }
-                } else {
-                    this.enter(nick);
                 }
-            },
-
-            enter: function(nick) {
-                this.user = nick;
-                document.getElementById('gate-layer').style.transform = "translateY(-100%)";
                 
-                const badge = document.getElementById('user-badge');
-                badge.innerText = nick.toUpperCase();
-                
-                if(this.isAdmin) {
-                    badge.innerText += " [ROOT]";
-                    badge.style.color = "#bc13fe";
-                    badge.style.textShadow = "0 0 10px #bc13fe";
-                }
-
+                this.user = n;
+                document.getElementById('login-gate').style.transform = "translateX(-100%)";
+                document.getElementById('user-info').innerText = this.isAdmin ? "STATUS: ROOT" : `USER: ${this.user.toUpperCase()}`;
                 this.listen();
             },
 
-            send: function() {
+            send() {
                 const text = document.getElementById('msg-input').value;
                 if(!text.trim()) return;
-
                 this.db.ref("global_chat").push({
-                    name: this.user,
-                    text: text,
-                    isAdmin: this.isAdmin,
+                    u: this.user,
+                    t: text,
+                    a: this.isAdmin,
                     ts: Date.now()
                 });
                 document.getElementById('msg-input').value = "";
             },
 
-            listen: function() {
+            listen() {
                 this.db.ref("global_chat").limitToLast(100).on("child_added", (snap) => {
-                    const data = snap.val();
-                    const id = snap.key;
+                    const d = snap.val();
+                    const k = snap.key;
+                    const isMe = d.u === this.user;
                     
-                    const isMe = data.name === this.user;
-                    const div = document.createElement('div');
+                    const el = document.createElement('div');
+                    el.className = `msg ${isMe ? 'mine' : ''} ${d.a ? 'admin' : ''}`;
+                    el.id = k;
                     
-                    // Logic for styles
-                    let bubbleClass = "bubble";
-                    let rowClass = isMe ? "msg-row right" : "msg-row left";
-                    if(data.isAdmin) rowClass += " admin-mode";
+                    let del = (this.isAdmin) ? `<a class="del-link" onclick="Core.drop('${k}')">DROP</a>` : "";
 
-                    // Admin Delete Button
-                    let delBtn = this.isAdmin ? `<span class="del-x" onclick="App.del('${id}')">DELETE</span>` : "";
-
-                    const time = new Date(data.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-
-                    div.className = rowClass;
-                    div.id = id;
-                    div.innerHTML = `
-                        <div class="${bubbleClass}">
-                            ${data.text}
-                        </div>
-                        <div class="meta">
-                            ${data.name} • ${time} ${delBtn}
-                        </div>
+                    el.innerHTML = `
+                        <span class="sender">${d.u} ${del}</span>
+                        <div class="text">${d.t}</div>
                     `;
-
-                    const chat = document.getElementById('chat-stream');
-                    chat.appendChild(div);
-                    chat.scrollTop = chat.scrollHeight;
+                    document.getElementById('messages').appendChild(el);
+                    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
                 });
 
                 this.db.ref("global_chat").on("child_removed", (snap) => {
@@ -407,15 +206,10 @@
                 });
             },
 
-            del: function(key) {
-                if(this.isAdmin && confirm("CONFIRM DELETE?")) {
-                    this.db.ref("global_chat").child(key).remove();
-                }
-            }
+            drop(k) { if(confirm("DELETE?")) this.db.ref("global_chat").child(k).remove(); }
         };
 
-        App.init();
-
+        Core.init();
     </script>
 </body>
 </html>
