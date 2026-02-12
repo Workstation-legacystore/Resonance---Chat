@@ -1,57 +1,90 @@
-/* Общие настройки */
-body {
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    overflow: hidden; /* Чтобы страница не скроллилась, только чат */
+:root {
+    --bg: #eef2f5;
+    --glass: rgba(255, 255, 255, 0.7);
+    --accent: #007aff;
+    --admin: #34c759;
 }
 
-#chat-container {
-    width: 95%;
-    max-width: 600px;
-    height: 70vh; /* Большое окно чата */
+body {
+    background: var(--bg);
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+#app-wrapper {
+    width: 100%;
+    max-width: 450px;
+    height: 100vh;
+    background: white;
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
+    box-shadow: 0 0 50px rgba(0,0,0,0.05);
 }
+
+.main-header {
+    padding: 20px;
+    background: white;
+    border-bottom: 1px solid #f0f0f0;
+    text-align: center;
+}
+
+.main-header h1 { font-size: 16px; margin: 0; letter-spacing: 3px; }
+.version { font-size: 10px; vertical-align: top; color: var(--accent); }
 
 #messages {
     flex: 1;
     overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.message-item {
-    background: rgba(255, 255, 255, 0.5);
-    padding: 10px 15px;
-    border-radius: 15px;
-    border: 1px solid rgba(255,255,255,0.2);
-    align-self: flex-start;
-    animation: slideIn 0.3s ease;
-}
-
-.message-item strong {
-    color: #007aff;
-    font-size: 0.8rem;
-    display: block;
-    margin-bottom: 3px;
-}
-
-.message-item p {
-    margin: 0;
-    font-size: 1rem;
-}
-
-@keyframes slideIn {
-    from { opacity: 0; transform: translateX(-10px); }
-    to { opacity: 1; transform: translateX(0); }
-}
-
-.input-area {
-    background: rgba(255,255,255,0.3);
     padding: 15px;
-    border-top: 1px solid rgba(0,0,0,0.05);
+    background: #f9f9f9;
+}
+
+/* Пузырьки в стиле Remaster */
+.msg {
+    margin-bottom: 12px;
+    display: flex;
+}
+
+.msg-content {
+    padding: 10px 14px;
+    border-radius: 18px;
+    position: relative;
+    max-width: 85%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.user-msg .msg-content { background: white; border: 1px solid #eee; }
+.admin-msg .msg-content { 
+    background: var(--accent); 
+    color: white; 
+    margin-left: auto;
+}
+
+.sender { font-size: 10px; font-weight: bold; display: block; margin-bottom: 2px; }
+.time { font-size: 9px; opacity: 0.5; float: right; }
+.del { cursor: pointer; color: red; margin-left: 10px; }
+
+.ui-panel { padding: 15px; border-top: 1px solid #eee; }
+.input-row { display: flex; gap: 8px; }
+
+.glass-input {
+    border: 1px solid #ddd;
+    padding: 12px;
+    border-radius: 12px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.glass-input:focus { border-color: var(--accent); }
+.small-input { width: 80px; }
+
+.action-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    width: 45px;
+    border-radius: 12px;
+    font-size: 20px;
+    cursor: pointer;
 }
