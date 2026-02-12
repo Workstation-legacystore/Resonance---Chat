@@ -3,185 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RESONANCE /// SYSTEM OVERRIDE</title>
+    <title>RESONANCE /// EVENT HORIZON</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
 
     <style>
-        /* === SYSTEM CORE STYLES === */
+        /* === GLOBAL RESET & VARIABLES === */
         :root {
-            --bg-color: #030305;
-            --terminal-green: #0aff0a;
-            --alert-red: #ff2a2a;
-            --admin-gold: #ffd700;
-            --neon-blue: #00f3ff;
-            --glass: rgba(10, 10, 15, 0.85);
-            --border: 1px solid rgba(255, 255, 255, 0.1);
+            --neon-primary: #00f3ff;
+            --neon-sec: #bc13fe;
+            --neon-danger: #ff003c;
+            --glass-bg: rgba(8, 8, 12, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --font-ui: 'Inter', sans-serif;
+            --font-cyber: 'Orbitron', sans-serif;
         }
 
-        * { box-sizing: border-box; outline: none; user-select: none; }
-        
+        * { box-sizing: border-box; outline: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+
         body {
             margin: 0; height: 100vh;
-            background-color: var(--bg-color);
-            font-family: 'JetBrains Mono', monospace;
-            color: white;
+            background: #000;
             overflow: hidden;
+            font-family: var(--font-ui);
+            color: white;
             display: flex; justify-content: center; align-items: center;
         }
 
-        /* Scanline Effect (Retro TV) */
-        body::after {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 999;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
+        /* === BACKGROUND SYSTEM (CANVAS) === */
+        #space-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
         }
 
-        /* === UI LAYERS === */
-        #interface-layer {
-            width: 100%; max-width: 600px; height: 100%;
+        /* === MAIN INTERFACE CONTAINER === */
+        #interface {
+            position: relative; z-index: 10;
+            width: 100%; max-width: 550px; height: 95vh;
             display: flex; flex-direction: column;
-            position: relative;
-            z-index: 10;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
+            overflow: hidden;
+            transition: 0.5s;
+            animation: introPop 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* Login Modal (Security Gate) */
-        #security-gate {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
-            backdrop-filter: blur(10px);
+        /* === LOGIN OVERLAY (The Gate) === */
+        #gate-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 5, 8, 0.95);
+            z-index: 100;
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            z-index: 100;
-            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+            transition: transform 0.6s cubic-bezier(0.8, 0, 0.2, 1);
         }
 
-        .gate-logo {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 3rem;
-            letter-spacing: 5px;
-            color: var(--neon-blue);
-            text-shadow: 0 0 20px var(--neon-blue);
-            margin-bottom: 40px;
-            animation: glitch 1s infinite alternate;
+        .cyber-logo {
+            font-family: var(--font-cyber);
+            font-size: 3rem; font-weight: 900;
+            background: linear-gradient(135deg, #fff 30%, var(--neon-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
         }
 
-        .input-group {
-            position: relative;
-            width: 80%;
-            margin-bottom: 20px;
+        .input-wrapper {
+            position: relative; width: 80%; max-width: 300px; margin-top: 40px;
         }
 
-        .cyber-input {
-            width: 100%;
+        .gate-input {
+            width: 100%; padding: 15px;
             background: rgba(255,255,255,0.05);
             border: 1px solid #333;
-            padding: 15px;
-            color: var(--neon-blue);
-            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-primary);
+            font-family: var(--font-cyber);
+            text-align: center; font-size: 1.2rem;
+            transition: 0.3s; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+        }
+
+        .gate-input:focus {
+            border-color: var(--neon-primary);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            background: rgba(0, 243, 255, 0.02);
+        }
+
+        .gate-btn {
+            margin-top: 20px;
+            padding: 15px 40px;
+            background: var(--neon-primary);
+            color: #000; font-weight: 900;
+            border: none; cursor: pointer;
+            font-family: var(--font-cyber);
             text-transform: uppercase;
             letter-spacing: 2px;
-            transition: 0.3s;
+            clip-path: polygon(20px 0, 100% 0, 100% 100%, 0 100%, 0 20px);
+            transition: 0.2s;
         }
+        
+        .gate-btn:hover { transform: scale(1.05); box-shadow: 0 0 30px var(--neon-primary); }
 
-        .cyber-input:focus {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
-        }
-
-        .cyber-btn {
-            background: var(--neon-blue);
-            color: black;
-            border: none;
-            padding: 15px 40px;
-            font-weight: bold;
-            cursor: pointer;
-            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
-            transition: 0.3s;
-        }
-
-        .cyber-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--neon-blue);
-        }
-
-        /* Chat Interface */
+        /* === CHAT UI === */
         header {
-            padding: 15px;
-            border-bottom: 1px solid #333;
-            background: rgba(0,0,0,0.5);
-            display: flex; justify-content: space-between;
-            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        .sys-stat { font-size: 10px; color: #555; }
-        .active-stat { color: var(--terminal-green); }
+        .brand-sm { font-family: var(--font-cyber); font-weight: 700; letter-spacing: 1px; }
+        .status-dot { width: 8px; height: 8px; background: #0f0; border-radius: 50%; box-shadow: 0 0 10px #0f0; display: inline-block; margin-right: 5px; }
 
-        #data-stream {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
+        #chat-stream {
+            flex: 1; overflow-y: auto; padding: 20px;
             display: flex; flex-direction: column; gap: 15px;
             scroll-behavior: smooth;
         }
 
-        /* Messages */
-        .packet {
-            max-width: 85%;
-            padding: 10px 15px;
-            border-left: 2px solid transparent;
-            background: rgba(255,255,255,0.03);
-            font-size: 14px;
-            line-height: 1.5;
+        .msg-row { display: flex; flex-direction: column; opacity: 0; animation: slideUp 0.3s forwards; }
+        
+        .bubble {
+            max-width: 85%; padding: 12px 18px;
+            font-size: 15px; line-height: 1.5;
             position: relative;
-            animation: packetIn 0.3s ease-out;
         }
 
-        .packet.mine {
-            align-self: flex-end;
-            border-left: none;
-            border-right: 2px solid var(--neon-blue);
+        /* Others */
+        .left .bubble {
+            background: rgba(255,255,255,0.05);
+            border-left: 2px solid rgba(255,255,255,0.2);
+            border-radius: 0 15px 15px 15px;
+        }
+
+        /* Me */
+        .right { align-items: flex-end; }
+        .right .bubble {
             background: rgba(0, 243, 255, 0.1);
+            border-right: 2px solid var(--neon-primary);
+            color: #fff;
+            border-radius: 15px 0 15px 15px;
             text-align: right;
         }
 
-        .packet.admin {
-            border: 1px solid var(--admin-gold);
-            background: rgba(255, 215, 0, 0.1);
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        /* ADMIN GOD MODE */
+        .admin-mode .bubble {
+            background: linear-gradient(90deg, rgba(188, 19, 254, 0.1), rgba(0,0,0,0));
+            border: 1px solid var(--neon-sec);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
+            color: #fff; text-shadow: 0 0 5px var(--neon-sec);
         }
 
-        .packet .meta {
-            display: block;
-            font-size: 9px;
-            opacity: 0.5;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-        }
+        .meta { font-size: 10px; opacity: 0.5; margin-top: 5px; font-family: var(--font-cyber); }
+        .del-x { color: var(--neon-danger); font-weight: bold; cursor: pointer; margin-left: 10px; font-size: 12px; }
 
-        .packet.admin .meta { color: var(--admin-gold); font-weight: bold; }
-
-        /* Control Panel */
-        .control-panel {
+        /* Input Area */
+        .control-bar {
             padding: 20px;
-            background: black;
-            border-top: 1px solid #333;
+            background: rgba(0,0,0,0.3);
+            border-top: 1px solid rgba(255,255,255,0.05);
             display: flex; gap: 10px;
         }
 
-        /* Animations */
-        @keyframes glitch {
-            0% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; }
-            100% { text-shadow: -2px 2px 0px #ff00ff, 2px -2px 0px #00ffff; }
+        .cyber-bar {
+            flex: 1; background: transparent; border: none;
+            border-bottom: 2px solid #333;
+            color: white; padding: 10px; font-family: var(--font-ui);
+            transition: 0.3s;
         }
-        @keyframes packetIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+        .cyber-bar:focus { border-color: var(--neon-primary); }
 
+        .send-btn {
+            background: transparent; color: var(--neon-primary);
+            border: 1px solid var(--neon-primary);
+            width: 40px; height: 40px; border-radius: 50%;
+            cursor: pointer; transition: 0.3s;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .send-btn:hover { background: var(--neon-primary); color: #000; box-shadow: 0 0 20px var(--neon-primary); }
+
+        /* Animations */
+        @keyframes introPop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
         /* Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #333; }
@@ -192,236 +199,222 @@
 </head>
 <body>
 
-    <div id="security-gate">
-        <div class="gate-logo">RESONANCE<br><span style="font-size:12px">SYSTEM OVERRIDE v9.0</span></div>
+    <canvas id="space-canvas"></canvas>
+
+    <div id="interface">
         
-        <div class="input-group">
-            <input type="text" id="auth-nick" class="cyber-input" placeholder="IDENTITY_STRING" maxlength="15">
-        </div>
-        
-        <div class="input-group" id="pass-group" style="display:none;">
-            <input type="password" id="auth-pass" class="cyber-input" placeholder="ACCESS_TOKEN (PASSWORD)">
+        <div id="gate-layer">
+            <div class="cyber-logo">RESONANCE</div>
+            <div style="font-size: 10px; letter-spacing: 5px; opacity: 0.7;">EVENT HORIZON vX</div>
+            
+            <div class="input-wrapper">
+                <input type="text" id="auth-nick" class="gate-input" placeholder="IDENTITY" autocomplete="off">
+            </div>
+            <div class="input-wrapper" id="pass-wrapper" style="display:none; margin-top:10px;">
+                <input type="password" id="auth-pass" class="gate-input" placeholder="ACCESS CODE" style="border-color: var(--neon-sec); color: var(--neon-sec);">
+            </div>
+
+            <button class="gate-btn" onclick="App.login()">INITIALIZE</button>
         </div>
 
-        <button class="cyber-btn" onclick="System.initSequence()">INITIALIZE LINK</button>
-        <div id="boot-log" style="margin-top:20px; color:#555; font-size:10px; height:20px;"></div>
-    </div>
-
-    <div id="interface-layer">
         <header>
             <div>
-                <span style="font-weight:bold; color:white;">RES.NET</span>
-                <span class="sys-stat"> :: LATENCY <span id="ping">12ms</span></span>
+                <div class="status-dot"></div>
+                <span class="brand-sm">LIVE FEED</span>
             </div>
-            <div id="user-display" class="sys-stat active-stat">GUEST</div>
+            <div id="user-badge" style="font-size: 12px; font-weight: bold;">GUEST</div>
         </header>
 
-        <div id="data-stream"></div>
+        <div id="chat-stream"></div>
 
-        <div class="control-panel">
-            <input type="text" id="cmd-input" class="cyber-input" placeholder="ENTER MESSAGE OR COMMAND..." style="border:none; padding:10px;">
-            <button class="cyber-btn" style="padding:10px 20px;" onclick="System.transmit()">SEND</button>
+        <div class="control-bar">
+            <input type="text" id="msg-input" class="cyber-bar" placeholder="Broadcast message...">
+            <button class="send-btn" onclick="App.send()">➤</button>
         </div>
     </div>
 
     <script>
         /**
-         * RESONANCE CORE KERNEL v9.0
-         * Architect: Workstation5495
+         * RESONANCE CORE [MAXIMALISM BUILD]
+         * By Workstation5495
          */
 
-        // 1. CONFIGURATION
-        const CONFIG = {
-            firebase: {
-                apiKey: "BOPE0sictEq_0Ui_1jjpvdeN2PSOfnQ-U2oNWAKtZFHbsIoHXHxMiO6bXoGSI4XZcWuYTPrrurqL793BJ-OqncA", // Твой ключ
-                databaseURL: "https://resonance-chat-5495-default-rtdb.firebaseio.com", // Твоя база
-                projectId: "resonance-chat-5495",
-                appId: "1:909712050521:web:your_app_id"
-            },
-            adminNick: "Workstation5495",
-            adminHash: "admin", // <--- ПАРОЛЬ АДМИНА ТУТ
-            version: "9.0.4"
-        };
-
-        // 2. SYSTEM CLASSES (OOP STRUCTURE)
+        // 1. STARFIELD ANIMATION ENGINE
+        const canvas = document.getElementById('space-canvas');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
         
-        class SecurityModule {
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Star {
             constructor() {
-                this.isAdmin = false;
-                this.currentUser = null;
-                this.bannedWords = ["spam", "bot"];
+                this.reset();
             }
-
-            checkIdentity(nick) {
-                if (nick === CONFIG.adminNick) return 'REQUIRE_AUTH';
-                if (nick.length < 3) return 'INVALID_LEN';
-                return 'GRANT_GUEST';
+            reset() {
+                this.x = (Math.random() - 0.5) * canvas.width * 2;
+                this.y = (Math.random() - 0.5) * canvas.height * 2;
+                this.z = Math.random() * canvas.width;
+                this.pz = this.z;
             }
-
-            sanitize(text) {
-                return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            update() {
+                this.z -= 10; // Speed
+                if(this.z < 1) { this.reset(); this.z = canvas.width; this.pz = this.z; }
             }
-
-            elevatePrivileges(pass) {
-                if (pass === CONFIG.adminHash) {
-                    this.isAdmin = true;
-                    return true;
-                }
-                return false;
+            draw() {
+                const sx = (this.x / this.z) * canvas.width + canvas.width/2;
+                const sy = (this.y / this.z) * canvas.height + canvas.height/2;
+                const r = (canvas.width - this.z) / canvas.width * 3;
+                
+                ctx.beginPath();
+                ctx.fillStyle = "white";
+                ctx.arc(sx, sy, r, 0, Math.PI*2);
+                ctx.fill();
             }
         }
 
-        class CoreSystem {
-            constructor() {
-                firebase.initializeApp(CONFIG.firebase);
+        for(let i=0; i<300; i++) stars.push(new Star());
+
+        function animate() {
+            ctx.fillStyle = "black";
+            ctx.fillRect(0,0,canvas.width, canvas.height);
+            stars.forEach(s => { s.update(); s.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+
+        // 2. APP LOGIC
+        const CONFIG = {
+            apiKey: "BOPE0sictEq_0Ui_1jjpvdeN2PSOfnQ-U2oNWAKtZFHbsIoHXHxMiO6bXoGSI4XZcWuYTPrrurqL793BJ-OqncA",
+            databaseURL: "https://resonance-chat-5495-default-rtdb.firebaseio.com",
+            projectId: "resonance-chat-5495",
+            appId: "1:909712050521:web:your_app_id"
+        };
+
+        const ADMIN_CFG = {
+            nick: "Workstation5495",
+            pass: "admin", // <--- ПОМЕНЯЙ ПАРОЛЬ НА СВОЙ!
+        };
+
+        const App = {
+            db: null,
+            user: null,
+            isAdmin: false,
+
+            init: function() {
+                firebase.initializeApp(CONFIG);
                 this.db = firebase.database();
-                this.security = new SecurityModule();
-                this.ui = {
-                    gate: document.getElementById('security-gate'),
-                    nickInput: document.getElementById('auth-nick'),
-                    passInput: document.getElementById('auth-pass'),
-                    passGroup: document.getElementById('pass-group'),
-                    log: document.getElementById('boot-log'),
-                    chat: document.getElementById('data-stream'),
-                    input: document.getElementById('cmd-input')
-                };
                 
-                this.setupListeners();
-                this.startPing();
-            }
+                // Admin Trigger
+                document.getElementById('auth-nick').addEventListener('input', (e) => {
+                    if(e.target.value === ADMIN_CFG.nick) {
+                        document.getElementById('pass-wrapper').style.display = 'block';
+                    }
+                });
 
-            log(msg) {
-                this.ui.log.innerText = "> " + msg;
-            }
+                // Enter Key listeners
+                document.getElementById('msg-input').onkeypress = (e) => { if(e.key === 'Enter') this.send(); };
+                document.getElementById('auth-pass').onkeypress = (e) => { if(e.key === 'Enter') this.login(); };
+            },
 
-            initSequence() {
-                const nick = this.ui.nickInput.value.trim();
-                const status = this.security.checkIdentity(nick);
+            login: function() {
+                const nick = document.getElementById('auth-nick').value.trim();
+                if(!nick) return;
 
-                if (status === 'INVALID_LEN') {
-                    this.log("ERROR: IDENTITY TOO SHORT");
-                    return;
-                }
-
-                if (status === 'REQUIRE_AUTH') {
-                    if (this.ui.passGroup.style.display === 'none') {
-                        this.ui.passGroup.style.display = 'block';
-                        this.log("SECURITY ALERT: ADMIN DETECTED. PROVIDE TOKEN.");
-                        return;
+                if(nick === ADMIN_CFG.nick) {
+                    const pass = document.getElementById('auth-pass').value;
+                    if(pass === ADMIN_CFG.pass) {
+                        this.isAdmin = true;
+                        this.enter(nick);
                     } else {
-                        const pass = this.ui.passInput.value;
-                        if (this.security.elevatePrivileges(pass)) {
-                            this.login(nick);
-                        } else {
-                            this.log("ACCESS DENIED. SYSTEM LOCKED.");
-                            this.ui.nickInput.value = "";
-                        }
+                        alert("ACCESS DENIED");
+                        document.getElementById('auth-nick').value = "";
+                        document.getElementById('pass-wrapper').style.display = 'none';
                     }
                 } else {
-                    this.login(nick);
+                    this.enter(nick);
                 }
-            }
+            },
 
-            login(nick) {
-                this.security.currentUser = nick;
-                this.log("ACCESS GRANTED. WELCOME.");
+            enter: function(nick) {
+                this.user = nick;
+                document.getElementById('gate-layer').style.transform = "translateY(-100%)";
                 
-                // Анимация открытия ворот
-                setTimeout(() => {
-                    this.ui.gate.style.transform = "translateY(-100%)";
-                    document.getElementById('user-display').innerText = nick.toUpperCase();
-                    if(this.security.isAdmin) {
-                        document.getElementById('user-display').style.color = "var(--admin-gold)";
-                        document.getElementById('user-display').innerText += " [ROOT]";
-                    }
-                    this.loadMessages();
-                }, 800);
-            }
-
-            transmit() {
-                const text = this.ui.input.value;
-                if (!text.trim()) return;
-
-                // Проверка команд
-                if(text.startsWith("/clear") && this.security.isAdmin) {
-                    if(confirm("EXECUTE PURGE?")) this.db.ref("global_chat").remove();
-                    this.ui.input.value = "";
-                    return;
+                const badge = document.getElementById('user-badge');
+                badge.innerText = nick.toUpperCase();
+                
+                if(this.isAdmin) {
+                    badge.innerText += " [ROOT]";
+                    badge.style.color = "#bc13fe";
+                    badge.style.textShadow = "0 0 10px #bc13fe";
                 }
 
-                const safeText = this.security.sanitize(text);
+                this.listen();
+            },
+
+            send: function() {
+                const text = document.getElementById('msg-input').value;
+                if(!text.trim()) return;
 
                 this.db.ref("global_chat").push({
-                    user: this.security.currentUser,
-                    msg: safeText,
-                    type: this.security.isAdmin ? 'admin' : 'user',
-                    timestamp: Date.now()
+                    name: this.user,
+                    text: text,
+                    isAdmin: this.isAdmin,
+                    ts: Date.now()
                 });
+                document.getElementById('msg-input').value = "";
+            },
 
-                this.ui.input.value = "";
-            }
-
-            loadMessages() {
-                this.db.ref("global_chat").limitToLast(50).on("child_added", (snap) => {
+            listen: function() {
+                this.db.ref("global_chat").limitToLast(100).on("child_added", (snap) => {
                     const data = snap.val();
-                    const key = snap.key;
+                    const id = snap.key;
                     
-                    const el = document.createElement("div");
-                    const isMe = data.user === this.security.currentUser;
+                    const isMe = data.name === this.user;
+                    const div = document.createElement('div');
                     
-                    el.className = `packet ${isMe ? 'mine' : ''} ${data.type === 'admin' ? 'admin' : ''}`;
-                    el.id = key;
+                    // Logic for styles
+                    let bubbleClass = "bubble";
+                    let rowClass = isMe ? "msg-row right" : "msg-row left";
+                    if(data.isAdmin) rowClass += " admin-mode";
 
-                    let deleteBtn = "";
-                    if (this.security.isAdmin) {
-                        deleteBtn = `<span style="color:red; cursor:pointer; margin-left:10px;" onclick="System.purge('${key}')">[DEL]</span>`;
-                    }
+                    // Admin Delete Button
+                    let delBtn = this.isAdmin ? `<span class="del-x" onclick="App.del('${id}')">DELETE</span>` : "";
 
-                    const time = new Date(data.timestamp).toLocaleTimeString();
+                    const time = new Date(data.ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 
-                    el.innerHTML = `
-                        <span class="meta">${data.user} :: ${time} ${deleteBtn}</span>
-                        ${data.msg}
+                    div.className = rowClass;
+                    div.id = id;
+                    div.innerHTML = `
+                        <div class="${bubbleClass}">
+                            ${data.text}
+                        </div>
+                        <div class="meta">
+                            ${data.name} • ${time} ${delBtn}
+                        </div>
                     `;
 
-                    this.ui.chat.appendChild(el);
-                    this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
+                    const chat = document.getElementById('chat-stream');
+                    chat.appendChild(div);
+                    chat.scrollTop = chat.scrollHeight;
                 });
 
-                // Слушатель удаления
                 this.db.ref("global_chat").on("child_removed", (snap) => {
                     const el = document.getElementById(snap.key);
                     if(el) el.remove();
                 });
-            }
+            },
 
-            purge(key) {
-                if(this.security.isAdmin) {
+            del: function(key) {
+                if(this.isAdmin && confirm("CONFIRM DELETE?")) {
                     this.db.ref("global_chat").child(key).remove();
                 }
             }
+        };
 
-            setupListeners() {
-                this.ui.input.onkeypress = (e) => {
-                    if(e.key === 'Enter') this.transmit();
-                };
-                // Динамическая проверка поля ника
-                this.ui.nickInput.oninput = () => {
-                    if(this.ui.nickInput.value === CONFIG.adminNick) {
-                        this.ui.passGroup.style.display = 'block';
-                    }
-                };
-            }
-
-            startPing() {
-                setInterval(() => {
-                    document.getElementById('ping').innerText = Math.floor(Math.random() * 20 + 10) + "ms";
-                }, 2000);
-            }
-        }
-
-        // 3. INITIALIZATION
-        const System = new CoreSystem();
+        App.init();
 
     </script>
 </body>
