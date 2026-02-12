@@ -3,72 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RESONANCE | INFINITY</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>RESONANCE | GLOBAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #000; --accent: #fff; --danger: #ff453a; --glass: rgba(10, 10, 10, 0.8); }
+        :root { --bg: #000; --card: #0a0a0a; --text: #fff; --danger: #ff453a; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         
         body { 
-            height: 100dvh; background: #000; color: #fff; 
+            height: 100dvh; background: var(--bg); color: var(--text); 
             font-family: 'Inter', sans-serif; display: flex; 
             justify-content: center; align-items: center; overflow: hidden; 
         }
-
-        /* ОСНОВНОЙ КОНТЕЙНЕР БЕЗ ЛИШНИХ ГРАНИЦ */
+        
         #app-core { 
             width: 100%; height: 100%; display: flex; flex-direction: column; 
-            background: transparent; position: relative; 
+            background: var(--card); position: relative; overflow: hidden; 
         }
-        @media (min-width: 600px) { #app-core { max-width: 420px; height: 95vh; } }
+        
+        @media (min-width: 600px) { #app-core { max-width: 420px; height: 95vh; border-radius: 24px; border: 1px solid #111; } }
 
-        /* СКРЫТАЯ АДМИН-ПАНЕЛЬ (ЗА ПРЕДЕЛАМИ ЧАТА) */
-        #admin-layer {
-            position: absolute; top: 80px; left: -260px; width: 240px; 
-            background: var(--glass); backdrop-filter: blur(15px);
-            padding: 20px; border-radius: 20px; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 500; border: 1px solid rgba(255,255,255,0.05);
-        }
-        #admin-layer.visible { left: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.8); }
+        /* EXIT ICON */
+        .door-btn { position: absolute; top: 18px; left: 20px; color: #333; cursor: pointer; z-index: 1000; transition: 0.2s; }
+        .door-btn:hover { color: var(--danger); }
 
-        header { height: 60px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; z-index: 100; }
-        .brand { font-family: 'Outfit'; font-weight: 900; font-size: 22px; letter-spacing: -1px; }
+        header { height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #111; }
+        .footer { height: 70px; padding: 0 15px; display: flex; align-items: center; gap: 10px; background: #000; }
 
-        /* ЧАТ С АНИМАЦИЕЙ */
-        #feed { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg-wrap { display: flex; flex-direction: column; max-width: 85%; animation: msgFly 0.4s ease-out; }
+        /* FEED */
+        #feed { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; }
+        .msg-wrap { display: flex; flex-direction: column; max-width: 85%; animation: msgIn 0.2s ease-out; }
         .msg-wrap.mine { align-self: flex-end; align-items: flex-end; }
         
-        .bubble { padding: 14px 18px; font-size: 15px; border-radius: 24px; line-height: 1.5; backdrop-filter: blur(5px); transition: 0.3s; }
-        .msg-wrap.mine .bubble { background: #fff; color: #000; border-radius: 24px 24px 4px 24px; }
-        .msg-wrap:not(.mine) .bubble { background: rgba(255,255,255,0.08); color: #fff; border-radius: 24px 24px 24px 4px; }
+        .bubble { padding: 12px 18px; font-size: 15px; border-radius: 20px; line-height: 1.4; word-wrap: break-word; }
+        .msg-wrap.mine .bubble { background: #fff; color: #000; border-radius: 20px 20px 4px 20px; }
+        .msg-wrap:not(.mine) .bubble { background: #161616; color: #fff; border-radius: 20px 20px 20px 4px; }
         
-        .meta { font-size: 8px; color: #444; margin-bottom: 5px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        .founder { color: var(--danger); margin-right: 5px; }
-
-        /* НИЖНЯЯ ПАНЕЛЬ БЕЗ ПОЛОСОК */
-        .footer { height: 80px; padding: 10px 20px; display: flex; align-items: center; gap: 10px; }
-        .input-area { 
-            flex: 1; background: rgba(255,255,255,0.05); border: none; 
-            padding: 0 25px; border-radius: 30px; color: #fff; height: 50px; 
-            font-size: 15px; transition: 0.3s; 
-        }
-        .input-area:focus { background: rgba(255,255,255,0.1); }
-
-        /* ИКОНКА ДВЕРИ (ВЫХОД) */
-        .door-icon { 
-            position: absolute; bottom: 100px; right: -60px; 
-            color: var(--danger); cursor: pointer; transition: 0.3s; 
-            opacity: 0.5; z-index: 1000;
-        }
-        .door-icon:hover { opacity: 1; right: 20px; }
+        .meta { font-size: 8px; color: #444; margin-bottom: 4px; font-weight: 800; text-transform: uppercase; }
+        .adm-btn { color: #555; margin-left: 8px; cursor: pointer; text-decoration: underline; }
 
         /* AUTH */
-        #auth-gate { position: absolute; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
-        .auth-inp { background: #111; border: none; color: #fff; padding: 20px; border-radius: 18px; margin-bottom: 10px; width: 100%; text-align: center; font-size: 16px; }
-        .auth-btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 18px; font-weight: 900; width: 100%; cursor: pointer; }
+        #auth-gate { position: absolute; inset: 0; background: #000; z-index: 2000; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
+        .auth-inp { background: #111; border: none; color: #fff; padding: 20px; border-radius: 15px; margin-bottom: 10px; width: 100%; text-align: center; font-size: 16px; }
+        .auth-btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 15px; font-weight: 900; width: 100%; cursor: pointer; }
 
-        @keyframes msgFly { from { opacity: 0; transform: translateY(15px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        /* INPUT */
+        .msg-input { flex: 1; background: #111; border: none; padding: 0 20px; border-radius: 25px; color: #fff; height: 45px; font-size: 15px; }
+        .send-btn { width: 45px; height: 45px; border-radius: 50%; background: #fff; color: #000; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } }
         ::-webkit-scrollbar { width: 0; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -76,43 +58,35 @@
 </head>
 <body>
     <div id="app-core">
-        <div id="admin-layer">
-            <div style="font-size: 10px; font-weight: 900; color: var(--danger); margin-bottom: 15px;">BAN MANAGEMENT</div>
-            <div id="ban-list"></div>
-        </div>
-
-        <div class="door-icon" onclick="Core.logout()">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+        <div class="door-btn" onclick="Core.logout()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
         </div>
 
         <div id="auth-gate">
-            <h1 style="font-family:'Outfit'; font-size:48px; text-align:center; margin-bottom:40px; letter-spacing:-2px;">RESONANCE</h1>
+            <h1 style="font-family:'Outfit'; font-size:42px; text-align:center; margin-bottom:40px; letter-spacing:-2px;">RESONANCE</h1>
             <div id="step-1" class="auth-step active">
-                <input type="text" id="nick-field" class="auth-inp" placeholder="Identity">
-                <button onclick="Auth.checkUser()" class="auth-btn">PROCEED</button>
+                <input type="text" id="nick-field" class="auth-inp" placeholder="Nickname">
+                <button onclick="Auth.checkUser()" class="auth-btn">NEXT</button>
             </div>
             <div id="step-login" class="auth-step">
                 <input type="password" id="login-pass" class="auth-inp" placeholder="Access Code">
                 <button onclick="Auth.doLogin()" class="auth-btn">LINK</button>
             </div>
             <div id="step-register" class="auth-step">
-                <input type="password" id="reg-pass1" class="auth-inp" placeholder="New Code">
-                <button onclick="Auth.doRegister()" class="auth-btn">CREATE</button>
+                <input type="password" id="reg-pass1" class="auth-inp" placeholder="Create Pass (min 8)">
+                <button onclick="Auth.doRegister()" class="auth-btn">INITIALIZE</button>
             </div>
         </div>
 
         <header>
-            <button class="icon-btn" onclick="Core.toggleAdmin()" id="adm-trigger" style="opacity: 0.2;">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-            </button>
-            <div class="brand">RESONANCE</div>
-            <div id="conn-status" style="width:6px; height:6px; background:#32d74b; border-radius:50%; box-shadow: 0 0 10px #32d74b;"></div>
+            <div style="font-family:'Outfit'; font-weight:800; font-size:18px; letter-spacing:1px;">RESONANCE GLOBAL</div>
+            <div id="conn-status" style="width:6px; height:6px; background:#32d74b; border-radius:50%; margin-left:10px;"></div>
         </header>
 
         <div id="feed"></div>
 
         <div class="footer">
-            <input type="text" id="msg-input" class="input-area" placeholder="Broadcast..." autocomplete="off">
+            <input type="text" id="msg-input" class="msg-input" placeholder="Message..." autocomplete="off">
             <button onclick="Core.send()" class="send-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
             </button>
@@ -130,20 +104,20 @@
             reset() { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById('step-1').classList.add('active'); },
             checkUser() {
                 const n = document.getElementById('nick-field').value.trim();
-                if (n.length < 3) return;
+                if (n.length < 3) return alert("Min 3 chars");
                 this.tempNick = n;
                 firebase.database().ref('users/' + n).once('value', s => { if (s.exists()) this.showStep('step-login'); else this.showStep('step-register'); });
             },
             showStep(id) { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById(id).classList.add('active'); },
             doRegister() {
                 const p1 = document.getElementById('reg-pass1').value;
-                if (p1.length < 8) return;
+                if (p1.length < 8) return alert("Min 8 symbols");
                 firebase.database().ref('users/' + this.tempNick).set({ pass: btoa(p1), joined: Date.now() }).then(() => this.finalizeLogin(this.tempNick, false));
             },
             doLogin() {
                 const p = document.getElementById('login-pass').value;
                 if (this.tempNick === CFG.admin && btoa(p) === CFG.hash) return this.finalizeLogin(this.tempNick, true);
-                firebase.database().ref('users/' + this.tempNick).once('value', s => { if (s.val() && s.val().pass === btoa(p)) this.finalizeLogin(this.tempNick, false); });
+                firebase.database().ref('users/' + this.tempNick).once('value', s => { if (s.val() && s.val().pass === btoa(p)) this.finalizeLogin(this.tempNick, false); else alert("Wrong Pass"); });
             },
             finalizeLogin(nick, isRoot) { Core.user = nick; Core.isRoot = isRoot; localStorage.setItem('res_user', nick); localStorage.setItem('res_root', isRoot); Core.checkSecurity(); }
         };
@@ -152,7 +126,7 @@
             db: null, user: null, isRoot: false, lastSent: 0,
             checkSecurity() {
                 firebase.database().ref("banned/" + this.user).once('value', sn => {
-                    if (sn.exists()) { localStorage.clear(); location.reload(); } else { document.getElementById('auth-gate').style.display = "none"; this.initApp(); }
+                    if (sn.exists()) { localStorage.clear(); alert("REVOKED"); location.reload(); } else { document.getElementById('auth-gate').style.display = "none"; this.initApp(); }
                 });
             },
             initApp() {
@@ -160,7 +134,6 @@
                 this.db.ref("chat").limitToLast(50).on("child_added", (s) => this.renderMsg(s.key, s.val()));
                 this.db.ref("chat").on("child_removed", s => document.getElementById(s.key)?.remove());
                 this.db.ref("kicks/" + this.user).on("value", s => { if(s.exists()) { this.db.ref("kicks/" + this.user).remove(); localStorage.clear(); location.reload(); } });
-                if(this.isRoot) { document.getElementById('adm-trigger').style.opacity = "1"; this.loadAdmin(); }
                 document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); };
             },
             send() {
@@ -172,21 +145,13 @@
             renderMsg(key, d) {
                 if (document.getElementById(key) || d.type === "req") return; 
                 const f = document.getElementById('feed'); const r = document.createElement('div'); r.id = key; r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
-                let b = d.r ? `<span class="founder">FOUNDER</span>` : "";
-                let t = this.isRoot ? `<span style="color:red; margin-left:10px;" onclick="Core.db.ref('chat/${key}').remove()">×</span> <span style="color:red; margin-left:5px;" onclick="Core.ban('${d.u}')">BAN</span>` : "";
+                let b = d.r ? `<span style="color:var(--danger); margin-right:5px;">FOUNDER</span>` : "";
+                let t = this.isRoot ? `<span class="adm-btn" onclick="Core.db.ref('chat/${key}').remove()">DEL</span> <span class="adm-btn" onclick="Core.ban('${d.u}')">BAN</span>` : "";
                 r.innerHTML = `<div class="meta">${b}${d.u}${t}</div><div class="bubble">${d.t}</div>`;
                 f.appendChild(r); f.scrollTop = f.scrollHeight;
             },
-            loadAdmin() {
-                this.db.ref("banned").on('value', sn => {
-                    const l = document.getElementById('ban-list'); l.innerHTML = "";
-                    if(sn.val()) Object.keys(sn.val()).forEach(k => { l.innerHTML += `<div style="color:red; font-size:10px; margin-bottom:10px;">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer;">[X]</span></div>`; });
-                });
-            },
-            unban(u) { if(confirm("Unban?")) this.db.ref("banned/" + u).remove(); },
             ban(u) { if(confirm("BAN?")) this.db.ref("banned/" + u).set(true); },
-            toggleAdmin() { document.getElementById('admin-layer').classList.toggle('visible'); },
-            logout() { localStorage.clear(); location.reload(); }
+            logout() { if(confirm("Disconnect?")) { localStorage.clear(); location.reload(); } }
         };
         Auth.init();
     </script>
