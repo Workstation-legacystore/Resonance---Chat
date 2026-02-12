@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RESONANCE | ONLINE</title>
+    <title>RESONANCE | DB SAVE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #000; --card: #0a0a0a; --text: #fff; --border: 1px solid rgba(255,255,255,0.1); --danger: #ff453a; --success: #32d74b; --offline: #444; }
+        :root { --bg: #000; --card: #0a0a0a; --text: #fff; --border: 1px solid rgba(255,255,255,0.1); --danger: #ff453a; --warn: #ff9f0a; --success: #32d74b; --offline: #444; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         
@@ -39,8 +39,15 @@
         .msg-wrap.mine .bubble { background: #fff; color: #000; border-radius: 20px 20px 4px 20px; }
         .msg-wrap:not(.mine) .bubble { background: #1a1a1a; color: #fff; border-radius: 20px 20px 20px 4px; }
         
-        .meta { font-size: 9px; color: #555; margin-bottom: 4px; padding: 0 8px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
-        .friend-badge { background: rgba(50, 215, 75, 0.2); color: var(--success); padding: 2px 6px; border-radius: 6px; font-weight: 800; font-size: 8px; }
+        .meta { font-size: 9px; color: #555; margin-bottom: 4px; padding: 0 8px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .friend-badge { background: rgba(50, 215, 75, 0.15); color: var(--success); padding: 2px 6px; border-radius: 6px; font-weight: 800; font-size: 8px; border: 1px solid rgba(50, 215, 75, 0.3); }
+
+        /* ADMIN TOOLS */
+        .adm-btn { cursor: pointer; font-weight: 800; opacity: 0.8; transition: 0.2s; font-size: 9px; margin-right: 5px; }
+        .adm-btn:hover { opacity: 1; }
+        .adm-del { color: var(--danger); }
+        .adm-kick { color: var(--warn); }
+        .adm-ban { color: #fff; background: var(--danger); padding: 1px 4px; border-radius: 3px; }
 
         /* SIDEBAR & FRIENDS */
         #sidebar { position: absolute; left: -100%; top: 0; bottom: 0; width: 280px; background: #050505; border-right: var(--border); z-index: 200; transition: 0.3s ease; padding: 25px; display: flex; flex-direction: column; }
@@ -126,7 +133,7 @@
             </button>
             <div style="font-family:'Outfit'; font-weight:800; letter-spacing:-0.5px; font-size:18px;">RESONANCE</div>
             <div style="width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
-                <div style="width:8px; height:8px; background:#32d74b; border-radius:50%; box-shadow:0 0 10px #32d74b;"></div>
+                <div id="conn-status" style="width:8px; height:8px; background:#32d74b; border-radius:50%; box-shadow:0 0 10px #32d74b;"></div>
             </div>
         </header>
 
@@ -157,66 +164,47 @@
                 if(cached) {
                      Core.user = cached;
                      Core.isRoot = localStorage.getItem('res_root') === 'true';
-                     Core.checkBanAndOpen();
+                     Core.checkSecurity();
                 }
             },
-            reset() {
-                document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active'));
-                document.getElementById('step-1').classList.add('active');
-            },
+            reset() { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById('step-1').classList.add('active'); },
             checkUser() {
                 const n = document.getElementById('nick-field').value.trim();
-                if (n.length < 3 || !/^[A-Za-z0-9_]+$/.test(n)) return alert("Invalid Nick (3+ chars, letters/nums only)");
+                if (n.length < 3 || !/^[A-Za-z0-9_]+$/.test(n)) return alert("Invalid Nick");
                 this.tempNick = n;
-
                 if (n === CFG.admin) { this.showStep('step-login'); return; }
-
                 firebase.database().ref('users/' + n).once('value', s => {
-                    if (s.exists()) this.showStep('step-login');
-                    else this.showStep('step-register');
+                    if (s.exists()) this.showStep('step-login'); else this.showStep('step-register');
                 });
             },
-            showStep(id) {
-                document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active'));
-                document.getElementById(id).classList.add('active');
-            },
+            showStep(id) { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById(id).classList.add('active'); },
             doRegister() {
-                const p1 = document.getElementById('reg-pass1').value;
-                const p2 = document.getElementById('reg-pass2').value;
-                const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-                
-                if (!regex.test(p1)) return alert("Pass: 8+ chars, letters + numbers needed.");
-                if (p1 !== p2) return alert("Passwords don't match");
-
-                firebase.database().ref('users/' + this.tempNick).set({
-                    pass: btoa(p1), joined: Date.now()
-                }).then(() => { this.finalizeLogin(this.tempNick, false); });
+                const p1 = document.getElementById('reg-pass1').value, p2 = document.getElementById('reg-pass2').value;
+                if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(p1)) return alert("Pass: 8+ chars, letters + numbers");
+                if (p1 !== p2) return alert("Mismatch");
+                firebase.database().ref('users/' + this.tempNick).set({ pass: btoa(p1), joined: Date.now() })
+                    .then(() => this.finalizeLogin(this.tempNick, false));
             },
             doLogin() {
                 const p = document.getElementById('login-pass').value;
                 if (this.tempNick === CFG.admin) {
-                    if (btoa(p) === CFG.hash) this.finalizeLogin(this.tempNick, true);
-                    else alert("Admin Denied");
-                    return;
+                    if (btoa(p) === CFG.hash) this.finalizeLogin(this.tempNick, true); else alert("Denied"); return;
                 }
                 firebase.database().ref('users/' + this.tempNick).once('value', s => {
-                    const data = s.val();
-                    if (data && data.pass === btoa(p)) this.finalizeLogin(this.tempNick, false);
-                    else alert("Wrong Password");
+                    if (s.val() && s.val().pass === btoa(p)) this.finalizeLogin(this.tempNick, false); else alert("Wrong Pass");
                 });
             },
             finalizeLogin(nick, isRoot) {
                 Core.user = nick; Core.isRoot = isRoot;
-                localStorage.setItem('res_user', nick);
-                localStorage.setItem('res_root', isRoot);
-                Core.checkBanAndOpen();
+                localStorage.setItem('res_user', nick); localStorage.setItem('res_root', isRoot);
+                Core.checkSecurity();
             }
         };
 
         const Core = {
-            db: null, user: null, isRoot: false, friends: [], pendingFriend: null, lastSent: 0,
+            db: null, user: null, isRoot: false, friends: [], activeReqKey: null, lastSent: 0,
             
-            checkBanAndOpen() {
+            checkSecurity() {
                 firebase.database().ref("banned/" + this.user).once('value', sn => {
                     if (sn.exists()) { localStorage.clear(); alert("BANNED"); location.reload(); } 
                     else {
@@ -225,21 +213,42 @@
                     }
                 });
             },
+
             initApp() {
                 this.db = firebase.database();
-                // --- PRESENCE SYSTEM (ONLINE STATUS) ---
+                // PRESENCE
                 const myStatus = this.db.ref("status/" + this.user);
                 this.db.ref(".info/connected").on("value", (snap) => {
                     if (snap.val() === true) {
                         myStatus.onDisconnect().set("offline");
                         myStatus.set("online");
+                        document.getElementById('conn-status').style.background = "#32d74b";
+                    } else {
+                        document.getElementById('conn-status').style.background = "#444";
                     }
                 });
-                // ---------------------------------------
                 
-                this.friends = JSON.parse(localStorage.getItem('res_friends_' + this.user) || "[]");
+                // KICK LISTENER
+                this.db.ref("kicks/" + this.user).on("value", s => {
+                    if(s.exists()) {
+                        this.db.ref("kicks/" + this.user).remove();
+                        localStorage.clear(); location.reload();
+                    }
+                });
+
+                // LOAD FRIENDS (DB)
+                this.db.ref("users/" + this.user + "/friends").on('value', s => {
+                    this.friends = s.val() ? Object.keys(s.val()) : [];
+                    this.renderFriends();
+                    // Update badges by redrawing feed
+                    const f = document.getElementById('feed');
+                    f.innerHTML = "";
+                    this.db.ref("chat").limitToLast(50).once('value', shot => {
+                        shot.forEach(c => this.renderMsg(c.key, c.val()));
+                    });
+                });
+
                 this.sync();
-                this.renderFriends(); // First render
                 if(this.isRoot) this.loadAdmin();
                 document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); };
             },
@@ -250,80 +259,91 @@
                 this.db.ref("chat").push({ u: "SYS", t: `REQ:${this.user}>${t}`, type: "req", from: this.user, to: t, ts: Date.now() });
                 document.getElementById('f-input').value = ""; this.toggleMenu();
             },
+            
             acceptFriend() {
-                if (this.pendingFriend && !this.friends.includes(this.pendingFriend)) {
-                    this.friends.push(this.pendingFriend);
-                    this.saveFriends();
-                    this.renderFriends();
+                // ADD FRIENDS TO DB
+                const friendName = document.getElementById('req-text').dataset.from;
+                if(friendName && this.activeReqKey) {
+                    this.db.ref("users/" + this.user + "/friends/" + friendName).set(true);
+                    this.db.ref("users/" + friendName + "/friends/" + this.user).set(true);
+                    
+                    // CRITICAL FIX: DELETE THE REQUEST MESSAGE FROM DB
+                    this.db.ref("chat").child(this.activeReqKey).remove(); 
                 }
                 document.getElementById('request-popup').classList.remove('active');
             },
+
             removeFriend(n) { 
-                this.friends = this.friends.filter(f => f !== n); 
-                this.saveFriends(); 
-                this.renderFriends(); 
+                if(confirm("Remove " + n + "?")) {
+                    this.db.ref("users/" + this.user + "/friends/" + n).remove();
+                    this.db.ref("users/" + n + "/friends/" + this.user).remove();
+                }
             },
-            saveFriends() { localStorage.setItem('res_friends_' + this.user, JSON.stringify(this.friends)); },
             
             renderFriends() {
                 const l = document.getElementById('f-list'); l.innerHTML = "";
                 this.friends.forEach(f => {
-                    // Create element first
-                    const div = document.createElement('div');
-                    div.className = 'friend-item';
+                    const div = document.createElement('div'); div.className = 'friend-item';
                     div.innerHTML = `<div style="display:flex; align-items:center;"><div id="status-${f}" class="status-dot"></div>${f}</div>
                                      <span onclick="Core.removeFriend('${f}')" style="color:var(--danger); cursor:pointer; font-weight:800; font-size:10px;">DEL</span>`;
                     l.appendChild(div);
-
-                    // LIVE STATUS LISTENER
                     this.db.ref("status/" + f).on('value', snap => {
-                        const s = snap.val();
                         const el = document.getElementById('status-' + f);
-                        if(el) {
-                            if(s === 'online') el.classList.add('online');
-                            else el.classList.remove('online');
-                        }
+                        if(el) el.className = `status-dot ${snap.val() === 'online' ? 'online' : ''}`;
                     });
                 });
             },
 
             send() {
-                if (Date.now() - this.lastSent < 3000) return alert("Slow down!");
+                if (Date.now() - this.lastSent < 2000) return alert("Slow down!");
                 this.lastSent = Date.now();
                 const i = document.getElementById('msg-input'); let t = i.value.trim(); if (!t) return;
                 BAD.forEach(w => { t = t.replace(new RegExp(w, "gi"), "***"); });
                 this.db.ref("chat").push({ u: this.user, t: t, r: this.isRoot, ts: Date.now() }); i.value = "";
             },
-            sync() {
-                this.db.ref("chat").limitToLast(50).on("child_added", (s) => {
-                    const d = s.val();
-                    
-                    // NOTIFICATION BUG FIX: Check if request is recent (< 60 seconds)
-                    if (d.type === "req" && d.to === this.user) {
-                        const isRecent = (Date.now() - d.ts) < 60000; 
-                        if (isRecent) {
-                            this.pendingFriend = d.from;
-                            document.getElementById('req-text').innerText = `@${d.from} wants to be friends!`;
-                            document.getElementById('request-popup').classList.add('active');
-                            setTimeout(() => document.getElementById('request-popup').classList.remove('active'), 10000);
-                        }
-                    }
-                    
-                    if (d.type !== "req") {
-                        const f = document.getElementById('feed'); const r = document.createElement('div');
-                        r.id = s.key; r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
-                        
-                        let badge = "";
-                        if(this.friends.includes(d.u)) badge = `<span class="friend-badge">FRIEND</span>`;
-                        
-                        let tools = "";
-                        if (this.isRoot) tools = `<span onclick="Core.drop('${s.key}')" style="color:var(--danger); cursor:pointer; margin-left:5px;">×</span> <span onclick="Core.ban('${d.u}')" style="color:var(--danger); cursor:pointer;">BAN</span>`;
 
-                        r.innerHTML = `<div class="meta">${badge} ${d.u} ${tools}</div><div class="bubble">${d.t}</div>`;
-                        f.appendChild(r); f.scrollTop = f.scrollHeight;
-                    }
+            sync() {
+                this.db.ref("chat").limitToLast(50).on("child_added", (s) => this.renderMsg(s.key, s.val()));
+                this.db.ref("chat").on("child_removed", (s) => {
+                    const el = document.getElementById(s.key); if(el) el.remove();
                 });
-                this.db.ref("chat").on("child_removed", (s) => document.getElementById(s.key)?.remove());
+            },
+
+            renderMsg(key, d) {
+                if (document.getElementById(key)) return; 
+
+                // REQUEST LOGIC
+                if (d.type === "req" && d.to === this.user) {
+                    // AUTO-CLEAN: If already friend, delete old request
+                    if(this.friends.includes(d.from)) {
+                        this.db.ref("chat").child(key).remove();
+                        return;
+                    }
+
+                    this.activeReqKey = key; // STORE KEY FOR DELETION
+                    const txt = document.getElementById('req-text');
+                    txt.innerText = `@${d.from} wants to be friends!`;
+                    txt.dataset.from = d.from;
+                    document.getElementById('request-popup').classList.add('active');
+                    return; 
+                }
+                if (d.type === "req") return; 
+
+                const f = document.getElementById('feed');
+                const r = document.createElement('div'); r.id = key; 
+                r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
+                
+                let badge = this.friends.includes(d.u) ? `<span class="friend-badge">FRIEND</span>` : "";
+                
+                let tools = "";
+                if (this.isRoot) {
+                    tools = `<span class="adm-btn adm-del" onclick="Core.drop('${key}')">DEL</span>
+                             <span class="adm-btn adm-kick" onclick="Core.kick('${d.u}')">KICK</span>
+                             <span class="adm-btn adm-ban" onclick="Core.ban('${d.u}')">BAN</span>`;
+                }
+
+                r.innerHTML = `<div class="meta">${badge} ${d.u} ${tools}</div><div class="bubble">${d.t}</div>`;
+                f.appendChild(r); f.scrollTop = f.scrollHeight;
             },
 
             loadAdmin() {
@@ -336,9 +356,12 @@
                     });
                 });
             },
-            unban(u) { if(confirm("Unban?")) this.db.ref("banned/" + u).remove(); },
-            ban(u) { if(confirm("BAN " + u + "?")) this.db.ref("banned/" + u).set(true); },
-            drop(k) { if(confirm("Del?")) this.db.ref("chat").child(k).remove(); },
+            
+            // CONFIRM ACTIONS
+            unban(u) { if(confirm("Unban " + u + "?")) this.db.ref("banned/" + u).remove(); },
+            ban(u) { if(confirm("BAN " + u + " FOREVER?")) this.db.ref("banned/" + u).set(true); },
+            kick(u) { if(confirm("Kick " + u + "?")) this.db.ref("kicks/" + u).set(Date.now()); },
+            drop(k) { if(confirm("Delete message?")) this.db.ref("chat").child(k).remove(); },
             
             toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
             logout() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } }
