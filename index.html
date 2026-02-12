@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RESONANCE | GLOBAL</title>
+    <title>RESONANCE | GLOBAL V1</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <style>
         :root { --bg: #000; --card: #0a0a0a; --text: #fff; --border: 1px solid rgba(255,255,255,0.1); --danger: #ff453a; }
@@ -23,11 +23,15 @@
         .msg-wrap:not(.mine) .bubble { background: #1a1a1a; color: #fff; border-radius: 20px 20px 20px 4px; }
         .meta { font-size: 9px; color: #555; margin-bottom: 4px; padding: 0 8px; text-transform: uppercase; display: flex; align-items: center; }
         .founder-badge { background: linear-gradient(90deg, #ff453a, #ff9f0a); color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 8px; margin-right: 5px; }
-        #sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: 250px; background: #050505; border-right: var(--border); z-index: 200; transform: translateX(-100%); transition: 0.3s ease; padding: 30px; display: flex; flex-direction: column; justify-content: space-between; }
+
+        /* SIDEBAR WITH ICON ONLY */
+        #sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: 250px; background: #050505; border-right: var(--border); z-index: 200; transform: translateX(-100%); transition: 0.3s ease; padding: 25px; display: flex; flex-direction: column; justify-content: space-between; }
         #sidebar.open { transform: translateX(0); }
-        .logout-btn { color: var(--danger); background: rgba(255, 69, 58, 0.1); border: none; font-weight: 800; cursor: pointer; padding: 15px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; }
+        .exit-icon { color: var(--danger); background: none; border: none; cursor: pointer; display: flex; align-items: center; opacity: 0.6; transition: 0.3s; }
+        .exit-icon:hover { opacity: 1; }
+
         #auth-gate { position: absolute; inset: 0; background: #000; z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
-        .input-std { background: #111; border: 1px solid #222; color: white; padding: 18px; border-radius: 16px; margin-bottom: 12px; width: 100%; font-size: 16px; }
+        .input-std { background: #111; border: 1px solid #222; color: white; padding: 18px; border-radius: 16px; margin-bottom: 12px; width: 100%; font-size: 16px; text-align: center; }
         .auth-step { display: none; width: 100%; } 
         .auth-step.active { display: block; animation: popIn 0.3s; }
         @keyframes popIn { from { opacity: 0; transform: scale(0.95); } }
@@ -38,14 +42,13 @@
 <body>
     <div id="app-core">
         <div id="sidebar">
-            <div id="admin-zone" style="display:none; padding:15px; border:1px solid var(--danger); border-radius:16px; background:rgba(255,69,58,0.05);">
-                <div style="font-size:10px; color:var(--danger); font-weight:800; margin-bottom:10px;">ADMIN: BANNED USERS</div>
-                <div id="ban-list" style="max-height: 200px; overflow-y: auto;"></div>
+            <div id="admin-zone" style="display:none;">
+                <div style="font-size:10px; color:#444; font-weight:800; margin-bottom:15px; letter-spacing:1px;">ADMIN / BANNED</div>
+                <div id="ban-list"></div>
             </div>
             <div></div>
-            <button onclick="Core.logout()" class="logout-btn">
-                <span>LOGOUT</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            <button onclick="Core.logout()" class="exit-icon" title="Logout">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
             </button>
         </div>
 
@@ -57,12 +60,10 @@
             </div>
             <div id="step-login" class="auth-step">
                 <input type="password" id="login-pass" class="input-std" placeholder="Password"><button onclick="Auth.doLogin()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">LOGIN</button>
-                <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:10px;">Back</button>
             </div>
             <div id="step-register" class="auth-step">
-                <input type="password" id="reg-pass1" class="input-std" placeholder="Password (min 8)"><input type="password" id="reg-pass2" class="input-std" placeholder="Confirm">
+                <input type="password" id="reg-pass1" class="input-std" placeholder="New Pass"><input type="password" id="reg-pass2" class="input-std" placeholder="Confirm">
                 <button onclick="Auth.doRegister()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">START</button>
-                <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:10px;">Back</button>
             </div>
         </div>
 
@@ -75,7 +76,7 @@
         <div id="feed"></div>
 
         <div class="footer">
-            <input type="text" id="msg-input" style="flex:1; background:#161616; border:1px solid #222; padding:0 20px; border-radius:25px; color:#fff; height:44px;" placeholder="Write message..." autocomplete="off">
+            <input type="text" id="msg-input" style="flex:1; background:#161616; border:1px solid #222; padding:0 20px; border-radius:25px; color:#fff; height:44px;" placeholder="Message..." autocomplete="off">
             <button id="send-btn" onclick="Core.send()" class="send-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></button>
         </div>
     </div>
@@ -98,7 +99,7 @@
             showStep(id) { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById(id).classList.add('active'); },
             doRegister() {
                 const p1 = document.getElementById('reg-pass1').value, p2 = document.getElementById('reg-pass2').value;
-                if (p1.length < 8 || p1 !== p2) return alert("Error in password!");
+                if (p1.length < 8 || p1 !== p2) return alert("Error!");
                 firebase.database().ref('users/' + this.tempNick).set({ pass: btoa(p1), joined: Date.now() }).then(() => this.finalizeLogin(this.tempNick, false));
             },
             doLogin() {
@@ -115,7 +116,7 @@
                 this.db = firebase.database();
                 this.db.ref("status/" + this.user).onDisconnect().set("offline");
                 this.db.ref("status/" + this.user).set("online");
-                this.db.ref("chat").limitToLast(50).on("child_added", (s) => this.renderMsg(s.key, s.val()));
+                this.db.ref("chat").limitToLast(40).on("child_added", (s) => this.renderMsg(s.key, s.val()));
                 this.db.ref("chat").on("child_removed", s => document.getElementById(s.key)?.remove());
                 this.db.ref("kicks/" + this.user).on("value", s => { if(s.exists()) { this.db.ref("kicks/" + this.user).remove(); localStorage.clear(); location.reload(); } });
                 if(this.isRoot) this.loadAdmin();
@@ -131,7 +132,7 @@
                 if (document.getElementById(key) || d.type === "req") return; 
                 const f = document.getElementById('feed'); const r = document.createElement('div'); r.id = key; r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
                 let b = d.r ? `<span class="founder-badge">FOUNDER</span>` : "";
-                let t = this.isRoot ? `<span style="color:red; cursor:pointer; font-size:9px; margin-left:10px;" onclick="Core.db.ref('chat/${key}').remove()">DEL</span> <span style="color:red; cursor:pointer; font-size:9px; margin-left:5px;" onclick="Core.ban('${d.u}')">BAN</span> <span style="color:orange; cursor:pointer; font-size:9px; margin-left:5px;" onclick="Core.kick('${d.u}')">KICK</span>` : "";
+                let t = this.isRoot ? `<span style="color:red; cursor:pointer; font-size:9px; margin-left:10px;" onclick="Core.db.ref('chat/${key}').remove()">DEL</span> <span style="color:red; cursor:pointer; font-size:9px; margin-left:5px;" onclick="Core.ban('${d.u}')">BAN</span>` : "";
                 r.innerHTML = `<div class="meta">${b}${d.u}${t}</div><div class="bubble">${d.t}</div>`;
                 f.appendChild(r); f.scrollTop = f.scrollHeight;
             },
@@ -139,12 +140,10 @@
                 document.getElementById('admin-zone').style.display = 'block';
                 this.db.ref("banned").on('value', sn => {
                     const l = document.getElementById('ban-list'); l.innerHTML = "";
-                    if(sn.val()) Object.keys(sn.val()).forEach(k => { l.innerHTML += `<div style="color:red; font-size:10px; font-weight:700; margin-bottom:8px;">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer; opacity:0.5; margin-left:5px;">[UNBAN]</span></div>`; });
+                    if(sn.val()) Object.keys(sn.val()).forEach(k => { l.innerHTML += `<div style="color:red; font-size:10px; font-weight:700; margin-bottom:10px;">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer; opacity:0.3; margin-left:5px;">[X]</span></div>`; });
                 });
             },
             unban(u) { if(confirm("Unban?")) this.db.ref("banned/" + u).remove(); },
-            ban(u) { if(confirm("BAN?")) this.db.ref("banned/" + u).set(true); },
-            kick(u) { if(confirm("Kick?")) this.db.ref("kicks/" + u).set(Date.now()); },
             toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
             logout() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } }
         };
