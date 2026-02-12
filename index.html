@@ -2,87 +2,222 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resonance — Workstation5495 Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Resonance — Workstation5495</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
     <style>
-        /* === ТВОЙ CSS ТЕПЕРЬ ТУТ === */
+        /* === ULTRA IMBA CSS === */
         :root {
-            --bg: #0f172a;
-            --accent: #38bdf8;
-            --glass: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
+            --bg-dark: #050505;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --neon-blue: #3b82f6;
+            --neon-purple: #8b5cf6;
+            --text-main: #ffffff;
+            --text-sec: #94a3b8;
         }
 
-        body, html {
-            margin: 0; height: 100%;
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg);
-            color: white;
-            display: flex; justify-content: center; align-items: center;
-        }
+        * { box-sizing: border-box; }
 
-        /* Экран входа */
-        #auth-screen {
-            text-align: center;
-            background: var(--glass);
-            padding: 40px;
-            border-radius: 30px;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-        }
-
-        .icon-box {
-            font-size: 50px; margin-bottom: 20px;
-            filter: drop-shadow(0 0 10px var(--accent));
-        }
-
-        /* Главный контейнер чата (скрыт до входа) */
-        #chat-app {
-            display: none;
-            width: 100%; max-width: 500px; height: 90vh;
-            flex-direction: column;
-            background: rgba(0,0,0,0.3);
-            border-radius: 25px; border: 1px solid var(--border);
+        body {
+            margin: 0;
+            height: 100vh;
+            background-color: var(--bg-dark);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-main);
             overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Анимированный фон (AURORA EFFECT) */
+        .aurora-bg {
+            position: absolute;
+            width: 100%; height: 100%;
+            z-index: -1;
+            background: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
+            animation: pulse-bg 10s infinite alternate;
+        }
+
+        @keyframes pulse-bg {
+            0% { opacity: 0.5; transform: scale(1); }
+            100% { opacity: 1; transform: scale(1.1); }
+        }
+
+        /* Контейнер приложения */
+        #app-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* ЭКРАН ВХОДА */
+        #login-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            transition: opacity 0.5s ease;
+        }
+
+        .brand-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .login-input {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            padding: 15px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 16px;
+            width: 100%;
+            outline: none;
+            text-align: center;
+            transition: 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .login-input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        }
+
+        .neon-btn {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border: none;
+            padding: 15px 40px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .neon-btn:active { transform: scale(0.95); }
+
+        /* ЧАТ ИНТЕРФЕЙС */
+        header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .status-badge {
+            font-size: 10px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: rgba(52, 211, 153, 0.1);
+            color: #34d399;
+            border: 1px solid rgba(52, 211, 153, 0.2);
         }
 
         #messages {
-            flex: 1; overflow-y: auto; padding: 20px;
-            display: flex; flex-direction: column; gap: 12px;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            scroll-behavior: smooth;
         }
 
-        .msg {
-            padding: 12px 16px; border-radius: 18px;
-            max-width: 80%; line-height: 1.4;
-            animation: fadeIn 0.3s ease;
+        /* Сообщения */
+        .msg-row {
+            display: flex;
+            flex-direction: column;
+            animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .user-msg { background: var(--glass); align-self: flex-start; border: 1px solid var(--border); }
-        .admin-msg { background: var(--accent); color: #000; align-self: flex-end; font-weight: 500; }
-
-        .input-area {
-            padding: 20px; background: rgba(0,0,0,0.2);
-            display: flex; gap: 10px;
+        .msg-bubble {
+            max-width: 85%;
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
         }
 
-        input {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            padding: 12px; border-radius: 12px;
-            color: white; outline: none; flex: 1;
+        /* Чужие сообщения */
+        .left .msg-bubble {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-bottom-left-radius: 4px;
+            align-self: flex-start;
         }
 
-        .btn {
-            background: var(--accent); border: none;
-            padding: 12px 25px; border-radius: 12px;
-            font-weight: bold; cursor: pointer; transition: 0.2s;
+        /* ТВОИ сообщения (Обычные) */
+        .right { align-items: flex-end; }
+        .right .msg-bubble {
+            background: #262626;
+            border-bottom-right-radius: 4px;
+            color: white;
         }
 
-        .btn:hover { transform: scale(1.05); opacity: 0.9; }
+        /* ADMIN GOD MODE STYLE */
+        .admin-glow .msg-bubble {
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+            border: none;
+            color: white;
+            font-weight: 500;
+        }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
+        .meta {
+            font-size: 10px;
+            color: var(--text-sec);
+            margin-top: 4px;
+            margin-left: 5px;
+        }
+
+        .del-btn {
+            color: #ff4757;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 8px;
+            opacity: 0.7;
+        }
+
+        /* Панель ввода */
+        .input-bar {
+            padding: 20px;
+            background: rgba(5, 5, 5, 0.8);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            gap: 10px;
+        }
+
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Скроллбар */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -90,27 +225,34 @@
 </head>
 <body>
 
-    <div id="auth-screen">
-        <div class="icon-box">📡</div>
-        <h2>RESONANCE</h2>
-        <p style="opacity: 0.6; font-size: 14px;">Always on Touch</p>
-        <input type="text" id="login-nick" placeholder="Enter Nickname" style="width: 200px; margin-bottom: 10px;"><br>
-        <button class="btn" onclick="tryLogin()">Connect</button>
-    </div>
+    <div class="aurora-bg"></div>
 
-    <div id="chat-app">
-        <header style="padding: 15px; border-bottom: 1px solid var(--border); text-align: center;">
-            <span id="display-name" style="color: var(--accent); font-weight: bold;"></span>
-        </header>
-        <div id="messages"></div>
-        <div class="input-area">
-            <input type="text" id="msgInput" placeholder="Write a message...">
-            <button class="btn" onclick="send()">↑</button>
+    <div id="app-container">
+        
+        <div id="login-screen">
+            <h1 class="brand-title">RESONANCE</h1>
+            <p style="color:var(--text-sec); margin-bottom: 30px; letter-spacing: 2px; font-size: 12px;">ALWAYS ON TOUCH</p>
+            
+            <input type="text" id="nick-field" class="login-input" placeholder="Identity Code (Nickname)">
+            <button class="neon-btn" onclick="authenticate()">INITIALIZE</button>
         </div>
+
+        <header>
+            <div style="font-weight: 800; letter-spacing: -0.5px;">RES.CHAT</div>
+            <div id="user-status" class="status-badge">GUEST MODE</div>
+        </header>
+
+        <div id="messages"></div>
+
+        <div class="input-bar">
+            <input type="text" id="msg-input" class="login-input" style="margin:0; text-align: left;" placeholder="Broadcast message...">
+            <button class="neon-btn" style="padding: 0 20px;" onclick="sendMessage()">➤</button>
+        </div>
+
     </div>
 
     <script>
-        // ТВОИ КЛЮЧИ (Вставь свои!)
+        // === ТВОИ КЛЮЧИ FIREBASE (Вставь их сюда) ===
         const firebaseConfig = {
             apiKey: "BOPE0sictEq_0Ui_1jjpvdeN2PSOfnQ-U2oNWAKtZFHbsIoHXHxMiO6bXoGSI4XZcWuYTPrrurqL793BJ-OqncA",
             databaseURL: "https://resonance-chat-5495-default-rtdb.firebaseio.com",
@@ -118,53 +260,120 @@
             appId: "1:909712050521:web:your_app_id"
         };
 
+        // Инициализация
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let myNick = "";
+        // === НАСТРОЙКИ АДМИНА ===
+        const ADMIN_NICK = "Workstation5495";
+        const ADMIN_PASS = "admin"; // <--- ПОМЕНЯЙ ПАРОЛЬ ТУТ!
+        let currentUser = "";
         let isAdmin = false;
-        const ADMIN_PASS = "ТВОЙ_ПАРОЛЬ"; // ПРИДУМАЙ И ВПИШИ ТУТ!
 
-        function tryLogin() {
-            const nick = document.getElementById('login-nick').value.trim();
-            if(!nick) return alert("Enter nickname!");
+        // Вход в систему
+        function authenticate() {
+            const nick = document.getElementById('nick-field').value.trim();
+            if(!nick) return;
 
-            if(nick === "Workstation5495") {
-                const p = prompt("Admin Password:");
-                if(p === ADMIN_PASS) {
+            if(nick === ADMIN_NICK) {
+                const pass = prompt("/// SECURITY BREACH DETECTED ///\nENTER OVERRIDE PASSWORD:");
+                if(pass === ADMIN_PASS) {
                     isAdmin = true;
+                    currentUser = nick;
+                    enterChat();
                 } else {
-                    return alert("Wrong password!");
+                    alert("ACCESS DENIED.");
+                    document.getElementById('nick-field').value = "";
                 }
+            } else {
+                currentUser = nick;
+                enterChat();
             }
-
-            myNick = nick;
-            document.getElementById('auth-screen').style.display = 'none';
-            document.getElementById('chat-app').style.display = 'flex';
-            document.getElementById('display-name').innerText = "Logged as: " + myNick;
         }
 
-        function send() {
-            const text = document.getElementById('msgInput').value;
+        function enterChat() {
+            document.getElementById('login-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('login-screen').style.display = 'none';
+            }, 500);
+            
+            const badge = document.getElementById('user-status');
+            if(isAdmin) {
+                badge.innerText = "SYSTEM ADMIN";
+                badge.style.color = "#8b5cf6";
+                badge.style.borderColor = "#8b5cf6";
+                badge.style.background = "rgba(139, 92, 246, 0.1)";
+            } else {
+                badge.innerText = currentUser.toUpperCase();
+            }
+        }
+
+        // Отправка
+        function sendMessage() {
+            const input = document.getElementById('msg-input');
+            const text = input.value;
             if(text.trim()) {
                 db.ref("global_chat").push({
-                    name: myNick,
+                    name: currentUser,
                     text: text,
-                    admin: isAdmin,
-                    time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+                    isAdmin: isAdmin,
+                    timestamp: Date.now()
                 });
-                document.getElementById('msgInput').value = "";
+                input.value = "";
             }
         }
 
-        db.ref("global_chat").on("child_added", (snap) => {
-            const d = snap.val();
-            const m = document.createElement("div");
-            m.className = d.admin ? "msg admin-msg" : "msg user-msg";
-            m.innerHTML = `<small style="font-size: 10px; opacity: 0.7;">${d.name}</small><br>${d.text}`;
-            document.getElementById('messages').appendChild(m);
-            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        // Enter отправляет
+        document.getElementById('msg-input').onkeypress = (e) => {
+            if(e.key === 'Enter') sendMessage();
+        };
+
+        // Удаление (Только для Workstation5495)
+        window.deleteMsg = (key) => {
+            if(isAdmin && confirm("PURGE DATA?")) {
+                db.ref("global_chat").child(key).remove();
+                document.getElementById(key).remove();
+            }
+        }
+
+        // Прием сообщений
+        db.ref("global_chat").on("child_added", (snapshot) => {
+            const data = snapshot.val();
+            const key = snapshot.key;
+            const msgList = document.getElementById('messages');
+            
+            const isMe = data.name === currentUser;
+            const isAdminMsg = data.isAdmin; // Проверка, от админа ли сообщение
+
+            const div = document.createElement('div');
+            div.id = key;
+            // Классы: если я - вправо, если админ - свечение
+            div.className = `msg-row ${isMe ? 'right' : 'left'} ${isAdminMsg ? 'admin-glow' : ''}`;
+            
+            const time = new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Кнопка удаления только если ты Админ
+            const delBtn = isAdmin ? `<span class="del-btn" onclick="deleteMsg('${key}')">×</span>` : '';
+
+            div.innerHTML = `
+                <div class="msg-bubble">
+                    ${data.text}
+                </div>
+                <div class="meta">
+                    ${data.name} • ${time} ${delBtn}
+                </div>
+            `;
+            
+            msgList.appendChild(div);
+            msgList.scrollTop = msgList.scrollHeight;
         });
+
+        // Удаление в реальном времени у всех
+        db.ref("global_chat").on("child_removed", (snapshot) => {
+            const el = document.getElementById(snapshot.key);
+            if(el) el.remove();
+        });
+
     </script>
 </body>
 </html>
