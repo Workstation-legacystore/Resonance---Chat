@@ -3,221 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resonance — Workstation5495</title>
+    <title>RESONANCE /// SYSTEM OVERRIDE</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* === ULTRA IMBA CSS === */
+        /* === SYSTEM CORE STYLES === */
         :root {
-            --bg-dark: #050505;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --neon-blue: #3b82f6;
-            --neon-purple: #8b5cf6;
-            --text-main: #ffffff;
-            --text-sec: #94a3b8;
+            --bg-color: #030305;
+            --terminal-green: #0aff0a;
+            --alert-red: #ff2a2a;
+            --admin-gold: #ffd700;
+            --neon-blue: #00f3ff;
+            --glass: rgba(10, 10, 15, 0.85);
+            --border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        * { box-sizing: border-box; }
-
+        * { box-sizing: border-box; outline: none; user-select: none; }
+        
         body {
-            margin: 0;
-            height: 100vh;
-            background-color: var(--bg-dark);
-            font-family: 'Inter', sans-serif;
-            color: var(--text-main);
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* Анимированный фон (AURORA EFFECT) */
-        .aurora-bg {
-            position: absolute;
-            width: 100%; height: 100%;
-            z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15), transparent 25%);
-            animation: pulse-bg 10s infinite alternate;
-        }
-
-        @keyframes pulse-bg {
-            0% { opacity: 0.5; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.1); }
-        }
-
-        /* Контейнер приложения */
-        #app-container {
-            width: 100%;
-            max-width: 480px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* ЭКРАН ВХОДА */
-        #login-screen {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(20px);
-            z-index: 100;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            transition: opacity 0.5s ease;
-        }
-
-        .brand-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -1px;
-            background: linear-gradient(to right, #fff, #94a3b8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-        }
-
-        .login-input {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            padding: 15px 20px;
-            border-radius: 20px;
+            margin: 0; height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'JetBrains Mono', monospace;
             color: white;
-            font-size: 16px;
-            width: 100%;
-            outline: none;
-            text-align: center;
-            transition: 0.3s;
+            overflow: hidden;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Scanline Effect (Retro TV) */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* === UI LAYERS === */
+        #interface-layer {
+            width: 100%; max-width: 600px; height: 100%;
+            display: flex; flex-direction: column;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Login Modal (Security Gate) */
+        #security-gate {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(10px);
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 100;
+            transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+        }
+
+        .gate-logo {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 3rem;
+            letter-spacing: 5px;
+            color: var(--neon-blue);
+            text-shadow: 0 0 20px var(--neon-blue);
+            margin-bottom: 40px;
+            animation: glitch 1s infinite alternate;
+        }
+
+        .input-group {
+            position: relative;
+            width: 80%;
             margin-bottom: 20px;
         }
 
-        .login-input:focus {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+        .cyber-input {
+            width: 100%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid #333;
+            padding: 15px;
+            color: var(--neon-blue);
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
         }
 
-        .neon-btn {
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+        .cyber-input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.2);
+        }
+
+        .cyber-btn {
+            background: var(--neon-blue);
+            color: black;
             border: none;
             padding: 15px 40px;
-            border-radius: 20px;
-            color: white;
-            font-weight: 700;
-            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
             transition: 0.3s;
-            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
         }
 
-        .neon-btn:active { transform: scale(0.95); }
+        .cyber-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
 
-        /* ЧАТ ИНТЕРФЕЙС */
+        /* Chat Interface */
         header {
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #333;
+            background: rgba(0,0,0,0.5);
+            display: flex; justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid var(--glass-border);
-            backdrop-filter: blur(10px);
         }
 
-        .status-badge {
-            font-size: 10px;
-            padding: 5px 10px;
-            border-radius: 20px;
-            background: rgba(52, 211, 153, 0.1);
-            color: #34d399;
-            border: 1px solid rgba(52, 211, 153, 0.2);
-        }
+        .sys-stat { font-size: 10px; color: #555; }
+        .active-stat { color: var(--terminal-green); }
 
-        #messages {
+        #data-stream {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: flex; flex-direction: column; gap: 15px;
             scroll-behavior: smooth;
         }
 
-        /* Сообщения */
-        .msg-row {
-            display: flex;
-            flex-direction: column;
-            animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .msg-bubble {
+        /* Messages */
+        .packet {
             max-width: 85%;
-            padding: 12px 18px;
-            border-radius: 20px;
-            font-size: 15px;
+            padding: 10px 15px;
+            border-left: 2px solid transparent;
+            background: rgba(255,255,255,0.03);
+            font-size: 14px;
             line-height: 1.5;
             position: relative;
+            animation: packetIn 0.3s ease-out;
         }
 
-        /* Чужие сообщения */
-        .left .msg-bubble {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            border-bottom-left-radius: 4px;
-            align-self: flex-start;
+        .packet.mine {
+            align-self: flex-end;
+            border-left: none;
+            border-right: 2px solid var(--neon-blue);
+            background: rgba(0, 243, 255, 0.1);
+            text-align: right;
         }
 
-        /* ТВОИ сообщения (Обычные) */
-        .right { align-items: flex-end; }
-        .right .msg-bubble {
-            background: #262626;
-            border-bottom-right-radius: 4px;
-            color: white;
+        .packet.admin {
+            border: 1px solid var(--admin-gold);
+            background: rgba(255, 215, 0, 0.1);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
         }
 
-        /* ADMIN GOD MODE STYLE */
-        .admin-glow .msg-bubble {
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
-            border: none;
-            color: white;
-            font-weight: 500;
+        .packet .meta {
+            display: block;
+            font-size: 9px;
+            opacity: 0.5;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
         }
 
-        .meta {
-            font-size: 10px;
-            color: var(--text-sec);
-            margin-top: 4px;
-            margin-left: 5px;
-        }
+        .packet.admin .meta { color: var(--admin-gold); font-weight: bold; }
 
-        .del-btn {
-            color: #ff4757;
-            font-weight: bold;
-            cursor: pointer;
-            margin-left: 8px;
-            opacity: 0.7;
-        }
-
-        /* Панель ввода */
-        .input-bar {
+        /* Control Panel */
+        .control-panel {
             padding: 20px;
-            background: rgba(5, 5, 5, 0.8);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--glass-border);
-            display: flex;
-            gap: 10px;
+            background: black;
+            border-top: 1px solid #333;
+            display: flex; gap: 10px;
         }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Animations */
+        @keyframes glitch {
+            0% { text-shadow: 2px 2px 0px #ff00ff, -2px -2px 0px #00ffff; }
+            100% { text-shadow: -2px 2px 0px #ff00ff, 2px -2px 0px #00ffff; }
+        }
+        @keyframes packetIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; } }
 
-        /* Скроллбар */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #333; }
     </style>
 
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -225,154 +192,236 @@
 </head>
 <body>
 
-    <div class="aurora-bg"></div>
-
-    <div id="app-container">
+    <div id="security-gate">
+        <div class="gate-logo">RESONANCE<br><span style="font-size:12px">SYSTEM OVERRIDE v9.0</span></div>
         
-        <div id="login-screen">
-            <h1 class="brand-title">RESONANCE</h1>
-            <p style="color:var(--text-sec); margin-bottom: 30px; letter-spacing: 2px; font-size: 12px;">ALWAYS ON TOUCH</p>
-            
-            <input type="text" id="nick-field" class="login-input" placeholder="Identity Code (Nickname)">
-            <button class="neon-btn" onclick="authenticate()">INITIALIZE</button>
+        <div class="input-group">
+            <input type="text" id="auth-nick" class="cyber-input" placeholder="IDENTITY_STRING" maxlength="15">
+        </div>
+        
+        <div class="input-group" id="pass-group" style="display:none;">
+            <input type="password" id="auth-pass" class="cyber-input" placeholder="ACCESS_TOKEN (PASSWORD)">
         </div>
 
+        <button class="cyber-btn" onclick="System.initSequence()">INITIALIZE LINK</button>
+        <div id="boot-log" style="margin-top:20px; color:#555; font-size:10px; height:20px;"></div>
+    </div>
+
+    <div id="interface-layer">
         <header>
-            <div style="font-weight: 800; letter-spacing: -0.5px;">RES.CHAT</div>
-            <div id="user-status" class="status-badge">GUEST MODE</div>
+            <div>
+                <span style="font-weight:bold; color:white;">RES.NET</span>
+                <span class="sys-stat"> :: LATENCY <span id="ping">12ms</span></span>
+            </div>
+            <div id="user-display" class="sys-stat active-stat">GUEST</div>
         </header>
 
-        <div id="messages"></div>
+        <div id="data-stream"></div>
 
-        <div class="input-bar">
-            <input type="text" id="msg-input" class="login-input" style="margin:0; text-align: left;" placeholder="Broadcast message...">
-            <button class="neon-btn" style="padding: 0 20px;" onclick="sendMessage()">➤</button>
+        <div class="control-panel">
+            <input type="text" id="cmd-input" class="cyber-input" placeholder="ENTER MESSAGE OR COMMAND..." style="border:none; padding:10px;">
+            <button class="cyber-btn" style="padding:10px 20px;" onclick="System.transmit()">SEND</button>
         </div>
-
     </div>
 
     <script>
-        // === ТВОИ КЛЮЧИ FIREBASE (Вставь их сюда) ===
-        const firebaseConfig = {
-            apiKey: "BOPE0sictEq_0Ui_1jjpvdeN2PSOfnQ-U2oNWAKtZFHbsIoHXHxMiO6bXoGSI4XZcWuYTPrrurqL793BJ-OqncA",
-            databaseURL: "https://resonance-chat-5495-default-rtdb.firebaseio.com",
-            projectId: "resonance-chat-5495",
-            appId: "1:909712050521:web:your_app_id"
+        /**
+         * RESONANCE CORE KERNEL v9.0
+         * Architect: Workstation5495
+         */
+
+        // 1. CONFIGURATION
+        const CONFIG = {
+            firebase: {
+                apiKey: "BOPE0sictEq_0Ui_1jjpvdeN2PSOfnQ-U2oNWAKtZFHbsIoHXHxMiO6bXoGSI4XZcWuYTPrrurqL793BJ-OqncA", // Твой ключ
+                databaseURL: "https://resonance-chat-5495-default-rtdb.firebaseio.com", // Твоя база
+                projectId: "resonance-chat-5495",
+                appId: "1:909712050521:web:your_app_id"
+            },
+            adminNick: "Workstation5495",
+            adminHash: "admin", // <--- ПАРОЛЬ АДМИНА ТУТ
+            version: "9.0.4"
         };
 
-        // Инициализация
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+        // 2. SYSTEM CLASSES (OOP STRUCTURE)
+        
+        class SecurityModule {
+            constructor() {
+                this.isAdmin = false;
+                this.currentUser = null;
+                this.bannedWords = ["spam", "bot"];
+            }
 
-        // === НАСТРОЙКИ АДМИНА ===
-        const ADMIN_NICK = "Workstation5495";
-        const ADMIN_PASS = "admin"; // <--- ПОМЕНЯЙ ПАРОЛЬ ТУТ!
-        let currentUser = "";
-        let isAdmin = false;
+            checkIdentity(nick) {
+                if (nick === CONFIG.adminNick) return 'REQUIRE_AUTH';
+                if (nick.length < 3) return 'INVALID_LEN';
+                return 'GRANT_GUEST';
+            }
 
-        // Вход в систему
-        function authenticate() {
-            const nick = document.getElementById('nick-field').value.trim();
-            if(!nick) return;
+            sanitize(text) {
+                return text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            }
 
-            if(nick === ADMIN_NICK) {
-                const pass = prompt("/// SECURITY BREACH DETECTED ///\nENTER OVERRIDE PASSWORD:");
-                if(pass === ADMIN_PASS) {
-                    isAdmin = true;
-                    currentUser = nick;
-                    enterChat();
-                } else {
-                    alert("ACCESS DENIED.");
-                    document.getElementById('nick-field').value = "";
+            elevatePrivileges(pass) {
+                if (pass === CONFIG.adminHash) {
+                    this.isAdmin = true;
+                    return true;
                 }
-            } else {
-                currentUser = nick;
-                enterChat();
+                return false;
             }
         }
 
-        function enterChat() {
-            document.getElementById('login-screen').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('login-screen').style.display = 'none';
-            }, 500);
-            
-            const badge = document.getElementById('user-status');
-            if(isAdmin) {
-                badge.innerText = "SYSTEM ADMIN";
-                badge.style.color = "#8b5cf6";
-                badge.style.borderColor = "#8b5cf6";
-                badge.style.background = "rgba(139, 92, 246, 0.1)";
-            } else {
-                badge.innerText = currentUser.toUpperCase();
+        class CoreSystem {
+            constructor() {
+                firebase.initializeApp(CONFIG.firebase);
+                this.db = firebase.database();
+                this.security = new SecurityModule();
+                this.ui = {
+                    gate: document.getElementById('security-gate'),
+                    nickInput: document.getElementById('auth-nick'),
+                    passInput: document.getElementById('auth-pass'),
+                    passGroup: document.getElementById('pass-group'),
+                    log: document.getElementById('boot-log'),
+                    chat: document.getElementById('data-stream'),
+                    input: document.getElementById('cmd-input')
+                };
+                
+                this.setupListeners();
+                this.startPing();
             }
-        }
 
-        // Отправка
-        function sendMessage() {
-            const input = document.getElementById('msg-input');
-            const text = input.value;
-            if(text.trim()) {
-                db.ref("global_chat").push({
-                    name: currentUser,
-                    text: text,
-                    isAdmin: isAdmin,
+            log(msg) {
+                this.ui.log.innerText = "> " + msg;
+            }
+
+            initSequence() {
+                const nick = this.ui.nickInput.value.trim();
+                const status = this.security.checkIdentity(nick);
+
+                if (status === 'INVALID_LEN') {
+                    this.log("ERROR: IDENTITY TOO SHORT");
+                    return;
+                }
+
+                if (status === 'REQUIRE_AUTH') {
+                    if (this.ui.passGroup.style.display === 'none') {
+                        this.ui.passGroup.style.display = 'block';
+                        this.log("SECURITY ALERT: ADMIN DETECTED. PROVIDE TOKEN.");
+                        return;
+                    } else {
+                        const pass = this.ui.passInput.value;
+                        if (this.security.elevatePrivileges(pass)) {
+                            this.login(nick);
+                        } else {
+                            this.log("ACCESS DENIED. SYSTEM LOCKED.");
+                            this.ui.nickInput.value = "";
+                        }
+                    }
+                } else {
+                    this.login(nick);
+                }
+            }
+
+            login(nick) {
+                this.security.currentUser = nick;
+                this.log("ACCESS GRANTED. WELCOME.");
+                
+                // Анимация открытия ворот
+                setTimeout(() => {
+                    this.ui.gate.style.transform = "translateY(-100%)";
+                    document.getElementById('user-display').innerText = nick.toUpperCase();
+                    if(this.security.isAdmin) {
+                        document.getElementById('user-display').style.color = "var(--admin-gold)";
+                        document.getElementById('user-display').innerText += " [ROOT]";
+                    }
+                    this.loadMessages();
+                }, 800);
+            }
+
+            transmit() {
+                const text = this.ui.input.value;
+                if (!text.trim()) return;
+
+                // Проверка команд
+                if(text.startsWith("/clear") && this.security.isAdmin) {
+                    if(confirm("EXECUTE PURGE?")) this.db.ref("global_chat").remove();
+                    this.ui.input.value = "";
+                    return;
+                }
+
+                const safeText = this.security.sanitize(text);
+
+                this.db.ref("global_chat").push({
+                    user: this.security.currentUser,
+                    msg: safeText,
+                    type: this.security.isAdmin ? 'admin' : 'user',
                     timestamp: Date.now()
                 });
-                input.value = "";
+
+                this.ui.input.value = "";
+            }
+
+            loadMessages() {
+                this.db.ref("global_chat").limitToLast(50).on("child_added", (snap) => {
+                    const data = snap.val();
+                    const key = snap.key;
+                    
+                    const el = document.createElement("div");
+                    const isMe = data.user === this.security.currentUser;
+                    
+                    el.className = `packet ${isMe ? 'mine' : ''} ${data.type === 'admin' ? 'admin' : ''}`;
+                    el.id = key;
+
+                    let deleteBtn = "";
+                    if (this.security.isAdmin) {
+                        deleteBtn = `<span style="color:red; cursor:pointer; margin-left:10px;" onclick="System.purge('${key}')">[DEL]</span>`;
+                    }
+
+                    const time = new Date(data.timestamp).toLocaleTimeString();
+
+                    el.innerHTML = `
+                        <span class="meta">${data.user} :: ${time} ${deleteBtn}</span>
+                        ${data.msg}
+                    `;
+
+                    this.ui.chat.appendChild(el);
+                    this.ui.chat.scrollTop = this.ui.chat.scrollHeight;
+                });
+
+                // Слушатель удаления
+                this.db.ref("global_chat").on("child_removed", (snap) => {
+                    const el = document.getElementById(snap.key);
+                    if(el) el.remove();
+                });
+            }
+
+            purge(key) {
+                if(this.security.isAdmin) {
+                    this.db.ref("global_chat").child(key).remove();
+                }
+            }
+
+            setupListeners() {
+                this.ui.input.onkeypress = (e) => {
+                    if(e.key === 'Enter') this.transmit();
+                };
+                // Динамическая проверка поля ника
+                this.ui.nickInput.oninput = () => {
+                    if(this.ui.nickInput.value === CONFIG.adminNick) {
+                        this.ui.passGroup.style.display = 'block';
+                    }
+                };
+            }
+
+            startPing() {
+                setInterval(() => {
+                    document.getElementById('ping').innerText = Math.floor(Math.random() * 20 + 10) + "ms";
+                }, 2000);
             }
         }
 
-        // Enter отправляет
-        document.getElementById('msg-input').onkeypress = (e) => {
-            if(e.key === 'Enter') sendMessage();
-        };
-
-        // Удаление (Только для Workstation5495)
-        window.deleteMsg = (key) => {
-            if(isAdmin && confirm("PURGE DATA?")) {
-                db.ref("global_chat").child(key).remove();
-                document.getElementById(key).remove();
-            }
-        }
-
-        // Прием сообщений
-        db.ref("global_chat").on("child_added", (snapshot) => {
-            const data = snapshot.val();
-            const key = snapshot.key;
-            const msgList = document.getElementById('messages');
-            
-            const isMe = data.name === currentUser;
-            const isAdminMsg = data.isAdmin; // Проверка, от админа ли сообщение
-
-            const div = document.createElement('div');
-            div.id = key;
-            // Классы: если я - вправо, если админ - свечение
-            div.className = `msg-row ${isMe ? 'right' : 'left'} ${isAdminMsg ? 'admin-glow' : ''}`;
-            
-            const time = new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
-            // Кнопка удаления только если ты Админ
-            const delBtn = isAdmin ? `<span class="del-btn" onclick="deleteMsg('${key}')">×</span>` : '';
-
-            div.innerHTML = `
-                <div class="msg-bubble">
-                    ${data.text}
-                </div>
-                <div class="meta">
-                    ${data.name} • ${time} ${delBtn}
-                </div>
-            `;
-            
-            msgList.appendChild(div);
-            msgList.scrollTop = msgList.scrollHeight;
-        });
-
-        // Удаление в реальном времени у всех
-        db.ref("global_chat").on("child_removed", (snapshot) => {
-            const el = document.getElementById(snapshot.key);
-            if(el) el.remove();
-        });
+        // 3. INITIALIZATION
+        const System = new CoreSystem();
 
     </script>
 </body>
