@@ -1,73 +1,57 @@
-/* Resonance Style by Workstation5495 */
-
-:root {
-    --bg-color: #f0f2f5;
-    --main-text: #1c1e21;
-    --glass: rgba(255, 255, 255, 0.6);
-    --accent: #007aff; /* Apple Blue */
-    --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+/* Общие настройки */
+body {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    overflow: hidden; /* Чтобы страница не скроллилась, только чат */
 }
 
-body {
-    background-color: var(--bg-color);
-    font-family: -apple-system, system-ui, sans-serif;
-    color: var(--main-text);
-    margin: 0;
+#chat-container {
+    width: 95%;
+    max-width: 600px;
+    height: 70vh; /* Большое окно чата */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    margin-top: 20px;
 }
 
-/* Стеклянный контейнер (Glassmorphism) */
-.glass-panel {
-    background: var(--glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-}
-
-/* Карточки устройств для каталога */
-.device-card {
-    width: 280px;
+#messages {
+    flex: 1;
+    overflow-y: auto;
     padding: 20px;
-    margin: 15px;
-    text-align: center;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
 }
 
-.device-card:hover {
-    transform: translateY(-10px);
-    background: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 15px 45px rgba(0,0,0,0.1);
+.message-item {
+    background: rgba(255, 255, 255, 0.5);
+    padding: 10px 15px;
+    border-radius: 15px;
+    border: 1px solid rgba(255,255,255,0.2);
+    align-self: flex-start;
+    animation: slideIn 0.3s ease;
 }
 
-.device-img {
-    width: 100%;
-    height: 180px;
-    background: #e0e0e0; /* Заглушка, пока нет фото */
-    border-radius: 18px;
-    margin-bottom: 15px;
-    object-fit: contain;
+.message-item strong {
+    color: #007aff;
+    font-size: 0.8rem;
+    display: block;
+    margin-bottom: 3px;
 }
 
-/* Глянцевая кнопка (тот самый Web 2.0 акцент) */
-.glossy-btn {
-    background: linear-gradient(180deg, #54aaff 0%, #007aff 100%);
-    border: none;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 50px;
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.4), 0 4px 15px rgba(0,122,255,0.3);
-    cursor: pointer;
-    transition: 0.2s;
+.message-item p {
+    margin: 0;
+    font-size: 1rem;
 }
 
-.glossy-btn:active {
-    transform: scale(0.95);
-    box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.input-area {
+    background: rgba(255,255,255,0.3);
+    padding: 15px;
+    border-top: 1px solid rgba(0,0,0,0.05);
 }
