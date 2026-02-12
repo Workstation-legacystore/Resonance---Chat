@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resonance — Always on Touch</title>
-    
+    <title>Resonance Chat — Always on Touch</title>
     <link rel="stylesheet" href="style.css">
-
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
@@ -17,48 +15,27 @@
         <p class="tagline">Always on Touch</p>
     </header>
 
-    <main>
-        <section id="chat-section">
-            <div id="chat-container" class="glass-panel">
-                <div id="messages">
-                    </div>
-                <div class="input-area">
-                    <input type="text" id="username" placeholder="Nickname" value="Workstation5495">
-                    <input type="text" id="messageInput" placeholder="Write a message...">
-                    <button id="sendBtn" class="glossy-btn">Send</button>
-                </div>
-            </div>
-        </section>
-
-        <hr style="width: 50%; opacity: 0.2; margin: 40px 0;">
-
-        <section id="catalog">
-            <h2 style="text-align: center; font-weight: 300;">Device Catalog (2007-2013)</h2>
-            <div class="catalog-grid" style="display: flex; flex-wrap: wrap; justify-content: center;">
-                
-                <div class="device-card glass-panel">
-                    <div class="device-img">📱</div> <span style="font-size: 12px; color: var(--accent);">2007</span>
-                    <h3>iPhone 2G</h3>
-                    <p style="font-size: 14px; opacity: 0.7;">The phone that changed everything. The beginning of the touch era.</p>
-                </div>
-
-            </div>
-        </section>
-    </main>
+    <div id="chat-container" class="glass-panel">
+        <div id="messages"></div>
+        <div class="input-area">
+            <input type="text" id="username" placeholder="Nickname" value="Workstation5495">
+            <input type="text" id="messageInput" placeholder="Type a message...">
+            <button id="sendBtn" class="glossy-btn">Send</button>
+        </div>
+    </div>
 
     <script>
-        // --- КОНФИГ FIREBASE (Вставь свои данные из консоли Firebase) ---
+        // ВСТАВЬ СВОИ ДАННЫЕ ИЗ FIREBASE НИЖЕ
         const firebaseConfig = {
-            apiKey: "ВАШ_КЛЮЧ",
-            authDomain: "ВАШ_ПРОЕКТ.firebaseapp.com",
-            databaseURL: "https://ВАШ_ПРОЕКТ.firebaseio.com",
-            projectId: "ВАШ_ПРОЕКТ_ID",
-            storageBucket: "ВАШ_ПРОЕКТ.appspot.com",
+            apiKey: "ТВОЙ_КЛЮЧ",
+            authDomain: "ТВОЙ_ДОМЕН",
+            databaseURL: "ТВОЯ_ССЫЛКА_НА_БАЗУ",
+            projectId: "ТВОЙ_ID",
+            storageBucket: "...",
             messagingSenderId: "...",
             appId: "..."
         };
 
-        // Инициализация
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -67,9 +44,8 @@
         const sendBtn = document.getElementById('sendBtn');
         const messagesDiv = document.getElementById('messages');
 
-        // Функция отправки
         function sendMessage() {
-            const name = usernameInput.value || "Anonymous";
+            const name = usernameInput.value || "Guest";
             const text = msgInput.value;
             if (text.trim() !== "") {
                 db.ref("global_chat").push({
@@ -84,19 +60,18 @@
         sendBtn.onclick = sendMessage;
         msgInput.onkeypress = (e) => { if(e.key === 'Enter') sendMessage() };
 
-        // Слушатель новых сообщений
         db.ref("global_chat").on("child_added", (snapshot) => {
             const data = snapshot.val();
             const messageElement = document.createElement("div");
-            messageElement.style.marginBottom = "10px";
-            messageElement.innerHTML = `<strong style="color:var(--accent)">${data.name}:</strong> ${data.text}`;
+            messageElement.className = "message-item";
+            messageElement.innerHTML = `<strong>${data.name}</strong><p>${data.text}</p>`;
             messagesDiv.appendChild(messageElement);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         });
     </script>
 
-    <footer style="margin: 40px 0; opacity: 0.5; font-size: 12px;">
-        &copy; 2026 Created by Workstation5495
+    <footer style="margin-top: 20px; opacity: 0.4; font-size: 11px;">
+        Workstation5495 &copy; 2026
     </footer>
 
 </body>
