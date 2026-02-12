@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RESONANCE | GLOBAL</title>
+    <title>RESONANCE | ONLINE</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #000; --card: #0a0a0a; --text: #fff; --border: 1px solid rgba(255,255,255,0.1); --danger: #ff453a; }
+        :root { --bg: #000; --card: #0a0a0a; --text: #fff; --border: 1px solid rgba(255,255,255,0.1); --danger: #ff453a; --success: #32d74b; --offline: #444; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         
@@ -18,15 +18,7 @@
         header { border-bottom: 1px solid #1a1a1a; backdrop-filter: blur(20px); }
         .footer { border-top: 1px solid #1a1a1a; background: #0a0a0a; gap: 12px; }
 
-        /* ADMIN ZONE STYLE */
-        #admin-zone {
-            display: none; /* Скрыто по умолчанию */
-            margin-top: 20px; padding: 15px; border: 1px solid var(--danger); 
-            border-radius: 15px; background: rgba(255, 69, 58, 0.05);
-        }
-        .banned-item { display: flex; justify-content: space-between; color: var(--danger); font-size: 13px; margin-bottom: 5px; font-weight: bold; }
-
-        /* POPUPS */
+        /* NOTIFICATIONS */
         #request-popup { 
             position: absolute; top: 80px; left: 50%; transform: translateX(-50%);
             width: calc(100% - 40px); background: #1a1a1a; color: #fff; 
@@ -46,17 +38,27 @@
         .bubble { padding: 12px 16px; font-size: 15px; border-radius: 20px; line-height: 1.4; word-wrap: break-word; }
         .msg-wrap.mine .bubble { background: #fff; color: #000; border-radius: 20px 20px 4px 20px; }
         .msg-wrap:not(.mine) .bubble { background: #1a1a1a; color: #fff; border-radius: 20px 20px 20px 4px; }
-        .meta { font-size: 9px; color: #555; margin-bottom: 4px; padding: 0 8px; text-transform: uppercase; display: flex; gap: 8px; }
+        
+        .meta { font-size: 9px; color: #555; margin-bottom: 4px; padding: 0 8px; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .friend-badge { background: rgba(50, 215, 75, 0.2); color: var(--success); padding: 2px 6px; border-radius: 6px; font-weight: 800; font-size: 8px; }
 
-        /* SIDEBAR */
+        /* SIDEBAR & FRIENDS */
         #sidebar { position: absolute; left: -100%; top: 0; bottom: 0; width: 280px; background: #050505; border-right: var(--border); z-index: 200; transition: 0.3s ease; padding: 25px; display: flex; flex-direction: column; }
         #sidebar.open { left: 0; }
+        
+        .friend-item { display: flex; justify-content: space-between; background: #111; padding: 12px; border-radius: 14px; margin-bottom: 8px; border: 1px solid #222; align-items: center; }
+        .status-dot { width: 8px; height: 8px; background: var(--offline); border-radius: 50%; margin-right: 10px; transition: 0.3s; }
+        .status-dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+        #admin-zone { display: none; margin-top: 20px; padding: 15px; border: 1px solid var(--danger); border-radius: 15px; background: rgba(255, 69, 58, 0.05); }
 
         /* AUTH GATE */
-        #auth-gate { position: absolute; inset: 0; background: #000; z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
+        #auth-gate { position: absolute; inset: 0; background: #000; z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; transition: 0.3s; }
         .brand-box { text-align: center; margin-bottom: 40px; }
         .slogan { color: #555; letter-spacing: 2px; font-size: 10px; text-transform: uppercase; margin-top: 8px; font-weight: 600; }
         .input-std { background: #111; border: 1px solid #222; color: white; padding: 18px; border-radius: 16px; margin-bottom: 12px; width: 100%; font-size: 16px; }
+        .auth-step { display: none; width: 100%; } 
+        .auth-step.active { display: block; animation: popIn 0.3s; }
 
         @keyframes slideIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         @keyframes popIn { from { opacity: 0; transform: scale(0.95); } }
@@ -79,16 +81,16 @@
             </div>
             
             <div id="admin-zone">
-                <div style="font-size:10px; color:#fff; margin-bottom:10px; letter-spacing:1px;">BANNED USERS:</div>
+                <div style="font-size:10px; color:#fff; margin-bottom:10px;">BANNED USERS:</div>
                 <div id="ban-list"></div>
             </div>
 
-            <div style="display:flex; gap:8px; margin-top: 20px;">
+            <div style="display:flex; gap:8px; margin-top:20px;">
                 <input type="text" id="f-input" style="flex:1; background:#161616; border:1px solid #222; padding:10px 15px; border-radius:20px; color:#fff; font-size:12px;" placeholder="Add Friend">
                 <button onclick="Core.requestFriend()" style="background:#fff; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer;">+</button>
             </div>
             <div id="f-list" style="flex:1; margin-top:20px; overflow-y:auto;"></div>
-            <button onclick="Core.logout()" style="color:var(--danger); background:none; border:none; font-weight:800; cursor:pointer;">EXIT SYSTEM</button>
+            <button onclick="Core.logout()" style="color:var(--danger); background:none; border:none; font-weight:800; cursor:pointer;">LOGOUT</button>
         </div>
 
         <div id="auth-gate">
@@ -96,9 +98,26 @@
                 <h1 style="font-family:'Outfit'; font-size:42px; margin:0; letter-spacing:-2px;">RESONANCE</h1>
                 <div class="slogan">Always in touch</div>
             </div>
-            <input type="text" id="nick-field" class="input-std" placeholder="Identity Nickname">
-            <input type="password" id="pass-field" class="input-std" placeholder="Admin Token" style="display:none">
-            <button onclick="Core.login()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">INITIALIZE</button>
+
+            <div id="step-1" class="auth-step active">
+                <input type="text" id="nick-field" class="input-std" placeholder="Enter Nickname">
+                <button onclick="Auth.checkUser()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">NEXT</button>
+            </div>
+
+            <div id="step-login" class="auth-step">
+                <p style="color:#666; font-size:12px; margin-bottom:10px;">Welcome back!</p>
+                <input type="password" id="login-pass" class="input-std" placeholder="Password">
+                <button onclick="Auth.doLogin()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">LOGIN</button>
+                <button onclick="Auth.reset()" style="background:none; color:#666; border:none; padding:10px; margin-top:5px; width:100%;">Back</button>
+            </div>
+
+            <div id="step-register" class="auth-step">
+                <p style="color:#666; font-size:12px; margin-bottom:10px;">Create Secure Account</p>
+                <input type="password" id="reg-pass1" class="input-std" placeholder="New Password (8+ chars)">
+                <input type="password" id="reg-pass2" class="input-std" placeholder="Confirm Password">
+                <button onclick="Auth.doRegister()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">CREATE ACCOUNT</button>
+                <button onclick="Auth.reset()" style="background:none; color:#666; border:none; padding:10px; margin-top:5px; width:100%;">Back</button>
+            </div>
         </div>
 
         <header>
@@ -122,145 +141,210 @@
     </div>
 
     <script>
-        const CONFIG = {
+        const CFG = {
             apiKey: "AIzaSyAmZnFT9sYDL7XFnbKqupwBIPC4zsoyIrk",
-            databaseURL: "https://resonance---chat-default-rtdb.firebaseio.com",
-            projectId: "resonance---chat",
+            dbURL: "https://resonance---chat-default-rtdb.firebaseio.com",
             admin: "Workstation5495",
             hash: "UlRXNTQ5NUpFTExZQkVBTg=="
         };
-        const BAD_WORDS = ["fuck", "bitch", "dick", "cunt", "bastard", "БЛЯДЬ", "ЕБАТЬ", "ПИЗДА", "ХУЙ", "ЗАЕБАЛ"];
+        const BAD = ["fuck", "bitch", "dick", "cunt", "БЛЯДЬ", "ЕБАТЬ", "ПИЗДА", "ХУЙ", "ЗАЕБАЛ"];
+
+        const Auth = {
+            tempNick: null,
+            init() {
+                firebase.initializeApp({apiKey: CFG.apiKey, databaseURL: CFG.dbURL});
+                const cached = localStorage.getItem('res_user');
+                if(cached) {
+                     Core.user = cached;
+                     Core.isRoot = localStorage.getItem('res_root') === 'true';
+                     Core.checkBanAndOpen();
+                }
+            },
+            reset() {
+                document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active'));
+                document.getElementById('step-1').classList.add('active');
+            },
+            checkUser() {
+                const n = document.getElementById('nick-field').value.trim();
+                if (n.length < 3 || !/^[A-Za-z0-9_]+$/.test(n)) return alert("Invalid Nick (3+ chars, letters/nums only)");
+                this.tempNick = n;
+
+                if (n === CFG.admin) { this.showStep('step-login'); return; }
+
+                firebase.database().ref('users/' + n).once('value', s => {
+                    if (s.exists()) this.showStep('step-login');
+                    else this.showStep('step-register');
+                });
+            },
+            showStep(id) {
+                document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+            },
+            doRegister() {
+                const p1 = document.getElementById('reg-pass1').value;
+                const p2 = document.getElementById('reg-pass2').value;
+                const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+                
+                if (!regex.test(p1)) return alert("Pass: 8+ chars, letters + numbers needed.");
+                if (p1 !== p2) return alert("Passwords don't match");
+
+                firebase.database().ref('users/' + this.tempNick).set({
+                    pass: btoa(p1), joined: Date.now()
+                }).then(() => { this.finalizeLogin(this.tempNick, false); });
+            },
+            doLogin() {
+                const p = document.getElementById('login-pass').value;
+                if (this.tempNick === CFG.admin) {
+                    if (btoa(p) === CFG.hash) this.finalizeLogin(this.tempNick, true);
+                    else alert("Admin Denied");
+                    return;
+                }
+                firebase.database().ref('users/' + this.tempNick).once('value', s => {
+                    const data = s.val();
+                    if (data && data.pass === btoa(p)) this.finalizeLogin(this.tempNick, false);
+                    else alert("Wrong Password");
+                });
+            },
+            finalizeLogin(nick, isRoot) {
+                Core.user = nick; Core.isRoot = isRoot;
+                localStorage.setItem('res_user', nick);
+                localStorage.setItem('res_root', isRoot);
+                Core.checkBanAndOpen();
+            }
+        };
 
         const Core = {
             db: null, user: null, isRoot: false, friends: [], pendingFriend: null, lastSent: 0,
-            init() {
-                firebase.initializeApp(CONFIG); this.db = firebase.database();
-                this.friends = JSON.parse(localStorage.getItem('res_f_v2') || "[]");
+            
+            checkBanAndOpen() {
+                firebase.database().ref("banned/" + this.user).once('value', sn => {
+                    if (sn.exists()) { localStorage.clear(); alert("BANNED"); location.reload(); } 
+                    else {
+                        document.getElementById('auth-gate').style.display = "none";
+                        this.initApp();
+                    }
+                });
+            },
+            initApp() {
+                this.db = firebase.database();
+                // --- PRESENCE SYSTEM (ONLINE STATUS) ---
+                const myStatus = this.db.ref("status/" + this.user);
+                this.db.ref(".info/connected").on("value", (snap) => {
+                    if (snap.val() === true) {
+                        myStatus.onDisconnect().set("offline");
+                        myStatus.set("online");
+                    }
+                });
+                // ---------------------------------------
                 
-                const s = localStorage.getItem('res_core_user');
-                if (s) {
-                    this.db.ref("banned/" + s).once('value', sn => {
-                        if (sn.exists()) { localStorage.clear(); location.reload(); }
-                        else {
-                            this.user = s; 
-                            this.isRoot = localStorage.getItem('res_core_root') === 'true'; 
-                            this.open();
-                        }
-                    });
-                }
-                document.getElementById('nick-field').oninput = (e) => { 
-                    document.getElementById('pass-field').style.display = (e.target.value === CONFIG.admin) ? 'block' : 'none'; 
-                };
+                this.friends = JSON.parse(localStorage.getItem('res_friends_' + this.user) || "[]");
+                this.sync();
+                this.renderFriends(); // First render
+                if(this.isRoot) this.loadAdmin();
                 document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); };
             },
-            login() {
-                const n = document.getElementById('nick-field').value.trim();
-                if (n.length < 3 || !/^[A-Za-z0-9_]+$/.test(n)) return alert("Invalid Nick");
-                
-                this.db.ref("banned/" + n).once('value', sn => {
-                    if (sn.exists()) return alert("ACCESS DENIED: ACCOUNT BANNED");
-                    
-                    if (n === CONFIG.admin) {
-                        if (btoa(document.getElementById('pass-field').value) === CONFIG.hash) { 
-                            this.isRoot = true; localStorage.setItem('res_core_root', 'true'); 
-                        } else return alert("Denied");
-                    }
-                    this.user = n; localStorage.setItem('res_core_user', n); this.open();
-                });
-            },
-            open() { 
-                document.getElementById('auth-gate').style.display = "none"; 
-                this.sync(); 
-                this.renderFriends();
-                if(this.isRoot) this.loadAdmin(); // Загружаем админку
-            },
-            
-            // --- ADMIN TOOLS ---
-            loadAdmin() {
-                document.getElementById('admin-zone').style.display = 'block';
-                this.db.ref("banned").on('value', sn => {
-                    const l = document.getElementById('ban-list'); l.innerHTML = "";
-                    const d = sn.val();
-                    if(d) {
-                        Object.keys(d).forEach(k => {
-                            l.innerHTML += `<div class="banned-item">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer; font-weight:400; text-decoration:underline;">UNBAN</span></div>`;
-                        });
-                    } else {
-                        l.innerHTML = "<span style='color:#555; font-size:10px;'>No banned users</span>";
-                    }
-                });
-            },
-            unban(user) {
-                if(confirm("Unban " + user + "?")) {
-                    this.db.ref("banned/" + user).remove();
-                }
-            },
-            ban(targetUser) {
-                if(confirm("BAN " + targetUser + " FOREVER?")) {
-                    this.db.ref("banned/" + targetUser).set(true);
-                }
-            },
-            // -------------------
 
-            toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
-            logout() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } },
             requestFriend() {
-                const target = document.getElementById('f-input').value.trim();
-                if (!target || target === this.user) return;
-                this.db.ref("chat").push({ u: "SYSTEM", t: `Request: @${this.user} -> @${target}`, type: "req", from: this.user, to: target });
+                const t = document.getElementById('f-input').value.trim();
+                if (!t || t === this.user) return;
+                this.db.ref("chat").push({ u: "SYS", t: `REQ:${this.user}>${t}`, type: "req", from: this.user, to: t, ts: Date.now() });
                 document.getElementById('f-input').value = ""; this.toggleMenu();
             },
             acceptFriend() {
                 if (this.pendingFriend && !this.friends.includes(this.pendingFriend)) {
                     this.friends.push(this.pendingFriend);
-                    localStorage.setItem('res_f_v2', JSON.stringify(this.friends));
+                    this.saveFriends();
                     this.renderFriends();
                 }
                 document.getElementById('request-popup').classList.remove('active');
             },
+            removeFriend(n) { 
+                this.friends = this.friends.filter(f => f !== n); 
+                this.saveFriends(); 
+                this.renderFriends(); 
+            },
+            saveFriends() { localStorage.setItem('res_friends_' + this.user, JSON.stringify(this.friends)); },
+            
             renderFriends() {
                 const l = document.getElementById('f-list'); l.innerHTML = "";
                 this.friends.forEach(f => {
-                    l.innerHTML += `<div style="display:flex; justify-content:space-between; background:#111; padding:12px; border-radius:14px; margin-bottom:8px; border:1px solid #222;">
-                        <div style="display:flex; align-items:center;"><div style="width:8px; height:8px; background:#32d74b; border-radius:50%; margin-right:10px;"></div>${f}</div>
-                        <span onclick="Core.removeFriend('${f}')" style="color:red; cursor:pointer; font-weight:800; font-size:10px;">DEL</span>
-                    </div>`;
+                    // Create element first
+                    const div = document.createElement('div');
+                    div.className = 'friend-item';
+                    div.innerHTML = `<div style="display:flex; align-items:center;"><div id="status-${f}" class="status-dot"></div>${f}</div>
+                                     <span onclick="Core.removeFriend('${f}')" style="color:var(--danger); cursor:pointer; font-weight:800; font-size:10px;">DEL</span>`;
+                    l.appendChild(div);
+
+                    // LIVE STATUS LISTENER
+                    this.db.ref("status/" + f).on('value', snap => {
+                        const s = snap.val();
+                        const el = document.getElementById('status-' + f);
+                        if(el) {
+                            if(s === 'online') el.classList.add('online');
+                            else el.classList.remove('online');
+                        }
+                    });
                 });
             },
-            removeFriend(n) { this.friends = this.friends.filter(f => f !== n); localStorage.setItem('res_f_v2', JSON.stringify(this.friends)); this.renderFriends(); },
+
             send() {
                 if (Date.now() - this.lastSent < 3000) return alert("Slow down!");
                 this.lastSent = Date.now();
                 const i = document.getElementById('msg-input'); let t = i.value.trim(); if (!t) return;
-                BAD_WORDS.forEach(w => { t = t.replace(new RegExp(w, "gi"), "***"); });
+                BAD.forEach(w => { t = t.replace(new RegExp(w, "gi"), "***"); });
                 this.db.ref("chat").push({ u: this.user, t: t, r: this.isRoot, ts: Date.now() }); i.value = "";
             },
             sync() {
-                this.db.ref("chat").limitToLast(40).on("child_added", (s) => {
+                this.db.ref("chat").limitToLast(50).on("child_added", (s) => {
                     const d = s.val();
+                    
+                    // NOTIFICATION BUG FIX: Check if request is recent (< 60 seconds)
                     if (d.type === "req" && d.to === this.user) {
-                        this.pendingFriend = d.from;
-                        document.getElementById('req-text').innerText = `@${d.from} wants to be friends!`;
-                        document.getElementById('request-popup').classList.add('active');
-                        setTimeout(() => document.getElementById('request-popup').classList.remove('active'), 10000);
+                        const isRecent = (Date.now() - d.ts) < 60000; 
+                        if (isRecent) {
+                            this.pendingFriend = d.from;
+                            document.getElementById('req-text').innerText = `@${d.from} wants to be friends!`;
+                            document.getElementById('request-popup').classList.add('active');
+                            setTimeout(() => document.getElementById('request-popup').classList.remove('active'), 10000);
+                        }
                     }
+                    
                     if (d.type !== "req") {
                         const f = document.getElementById('feed'); const r = document.createElement('div');
                         r.id = s.key; r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
-                        let adminTools = "";
-                        if (this.isRoot) {
-                            adminTools = `<span onclick="Core.drop('${s.key}')" style="color:#ff453a; cursor:pointer; margin-right:5px;">DEL</span> 
-                                          <span onclick="Core.ban('${d.u}')" style="color:#ff453a; cursor:pointer;">BAN</span>`;
-                        }
-                        r.innerHTML = `<div class="meta">${d.u} ${adminTools}</div><div class="bubble">${d.t}</div>`;
+                        
+                        let badge = "";
+                        if(this.friends.includes(d.u)) badge = `<span class="friend-badge">FRIEND</span>`;
+                        
+                        let tools = "";
+                        if (this.isRoot) tools = `<span onclick="Core.drop('${s.key}')" style="color:var(--danger); cursor:pointer; margin-left:5px;">×</span> <span onclick="Core.ban('${d.u}')" style="color:var(--danger); cursor:pointer;">BAN</span>`;
+
+                        r.innerHTML = `<div class="meta">${badge} ${d.u} ${tools}</div><div class="bubble">${d.t}</div>`;
                         f.appendChild(r); f.scrollTop = f.scrollHeight;
                     }
                 });
                 this.db.ref("chat").on("child_removed", (s) => document.getElementById(s.key)?.remove());
             },
-            drop(k) { if(confirm("Del?")) this.db.ref("chat").child(k).remove(); }
+
+            loadAdmin() {
+                document.getElementById('admin-zone').style.display = 'block';
+                this.db.ref("banned").on('value', sn => {
+                    const l = document.getElementById('ban-list'); l.innerHTML = "";
+                    const d = sn.val();
+                    if(d) Object.keys(d).forEach(k => {
+                        l.innerHTML += `<div style="color:red; font-size:12px; margin-bottom:5px;">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer; text-decoration:underline;">UNBAN</span></div>`;
+                    });
+                });
+            },
+            unban(u) { if(confirm("Unban?")) this.db.ref("banned/" + u).remove(); },
+            ban(u) { if(confirm("BAN " + u + "?")) this.db.ref("banned/" + u).set(true); },
+            drop(k) { if(confirm("Del?")) this.db.ref("chat").child(k).remove(); },
+            
+            toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
+            logout() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } }
         };
-        Core.init();
+        
+        Auth.init();
     </script>
 </body>
 </html>
