@@ -17,7 +17,7 @@
         #request-popup.active { display: flex; animation: slideIn 0.3s ease forwards; }
         .icon-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: #fff; cursor: pointer; }
         .send-btn { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #000; border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
-        .send-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .send-btn:disabled { background: #333; }
         #feed { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 10px; }
         .msg-wrap { display: flex; flex-direction: column; max-width: 80%; animation: popIn 0.3s ease; }
         .msg-wrap.mine { align-self: flex-end; align-items: flex-end; }
@@ -26,6 +26,7 @@
         .msg-wrap:not(.mine) .bubble { background: #1a1a1a; color: #fff; border-radius: 20px 20px 20px 4px; }
         .meta { font-size: 9px; color: #555; margin-bottom: 4px; padding: 0 8px; text-transform: uppercase; display: flex; align-items: center; }
         .founder-badge { background: linear-gradient(90deg, #ff453a, #ff9f0a); color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 8px; margin-right: 5px; }
+        .friend-label { color: var(--success); font-size: 8px; font-weight: 800; margin-right: 5px; }
         #sidebar { position: absolute; left: -100%; top: 0; bottom: 0; width: 280px; background: #050505; border-right: var(--border); z-index: 200; transition: 0.3s ease; padding: 25px; display: flex; flex-direction: column; }
         #sidebar.open { left: 0; }
         .friend-item { display: flex; justify-content: space-between; background: #111; padding: 12px; border-radius: 14px; margin-bottom: 8px; border: 1px solid #222; align-items: center; font-size: 14px; }
@@ -87,7 +88,7 @@
             <button class="icon-btn" onclick="Core.toggleMenu()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <div style="font-family:'Outfit'; font-weight:800; letter-spacing:-0.5px; font-size:18px;">RESONANCE V2.3.7</div>
+            <div style="font-family:'Outfit'; font-weight:800; letter-spacing:-0.5px; font-size:18px;">RESONANCE GLOBAL</div>
             <div style="width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
                 <div id="conn-status" style="width:8px; height:8px; background:#32d74b; border-radius:50%; box-shadow:0 0 10px #32d74b;"></div>
             </div>
@@ -106,7 +107,9 @@
             tempNick: null,
             init() {
                 firebase.initializeApp({apiKey: CFG.apiKey, databaseURL: CFG.dbURL});
-                if(localStorage.getItem('res_user')) { Core.user = localStorage.getItem('res_user'); Core.isRoot = localStorage.getItem('res_root') === 'true'; Core.checkSecurity(); }
+                if(localStorage.getItem('res_user')) { 
+                    Core.user = localStorage.getItem('res_user'); Core.isRoot = localStorage.getItem('res_root') === 'true'; Core.checkSecurity(); 
+                }
             },
             reset() { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById('step-1').classList.add('active'); },
             checkUser() {
@@ -145,15 +148,26 @@
                 this.db = firebase.database();
                 this.db.ref("status/" + this.user).onDisconnect().set("offline");
                 this.db.ref("status/" + this.user).set("online");
+                
+                // РЕАЛЬНОЕ ВРЕМЯ: Слушаем список друзей
                 this.db.ref("users/" + this.user + "/friends").on('value', s => {
+                    const oldFriends = this.friends;
                     this.friends = s.val() ? Object.keys(s.val()) : [];
                     this.renderFriends();
-                    const f = document.getElementById('feed'); f.innerHTML = "";
-                    this.db.ref("chat").limitToLast(30).once('value', shot => shot.forEach(c => this.renderMsg(c.key, c.val())));
+                    
+                    // Если список друзей изменился (тебя приняли), перерисовываем чат для появления меток [FRIEND]
+                    if (JSON.stringify(oldFriends) !== JSON.stringify(this.friends)) {
+                        this.refreshChat();
+                    }
                 });
+
                 this.db.ref("chat").limitToLast(1).on("child_added", (s) => this.renderMsg(s.key, s.val()));
                 this.db.ref("chat").on("child_removed", s => document.getElementById(s.key)?.remove());
                 document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); };
+            },
+            refreshChat() {
+                const f = document.getElementById('feed'); f.innerHTML = "";
+                this.db.ref("chat").limitToLast(40).once('value', shot => shot.forEach(c => this.renderMsg(c.key, c.val())));
             },
             requestFriend() {
                 const t = document.getElementById('f-input').value.trim();
@@ -164,7 +178,10 @@
             acceptFriend() {
                 const fromU = document.getElementById('req-text').dataset.from;
                 if(fromU && this.activeReqKey) {
-                    let u = {}; u[`users/${this.user}/friends/${fromU}`] = true; u[`users/${fromU}/friends/${this.user}`] = true; u[`chat/${this.activeReqKey}`] = null;
+                    let u = {}; 
+                    u[`users/${this.user}/friends/${fromU}`] = true; 
+                    u[`users/${fromU}/friends/${this.user}`] = true; 
+                    u[`chat/${this.activeReqKey}`] = null;
                     this.db.ref().update(u);
                 }
                 document.getElementById('request-popup').classList.remove('active');
@@ -181,24 +198,11 @@
             remF(n) { if(confirm("Remove?")) { let u = {}; u[`users/${this.user}/friends/${n}`] = null; u[`users/${n}/friends/${this.user}`] = null; this.db.ref().update(u); } },
             send() {
                 const now = Date.now();
-                const btn = document.getElementById('send-btn');
-                const inp = document.getElementById('msg-input');
-
-                // COOLDOWN LOGIC (3 SECONDS)
-                if (now - this.lastSentTime < 3000) {
-                    inp.placeholder = "Wait 3 seconds...";
-                    btn.style.background = "var(--danger)";
-                    setTimeout(() => { 
-                        inp.placeholder = "Write message..."; 
-                        btn.style.background = "#fff";
-                    }, 1000);
-                    return;
-                }
-
-                let t = inp.value.trim(); if (!t) return;
+                if (now - this.lastSentTime < 3000) return;
+                let t = document.getElementById('msg-input').value.trim(); if (!t) return;
                 this.lastSentTime = now;
                 this.db.ref("chat").push({ u: this.user, t: t, r: this.isRoot, ts: Date.now() });
-                inp.value = "";
+                document.getElementById('msg-input').value = "";
             },
             renderMsg(key, d) {
                 if (document.getElementById(key)) return; 
@@ -210,8 +214,8 @@
                 }
                 if (d.type === "req") return; 
                 const f = document.getElementById('feed'); const r = document.createElement('div'); r.id = key; r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
-                let b = d.r ? `<span class="founder-badge">FOUNDER</span>` : (this.friends.includes(d.u) ? `<span style="color:var(--success); font-size:8px; font-weight:800; margin-right:5px;">[FRIEND]</span>` : "");
-                let t = this.isRoot ? `<span style="color:red; margin-left:10px; cursor:pointer;" onclick="Core.db.ref('chat/${key}').remove()">DEL</span>` : "";
+                let b = d.r ? `<span class="founder-badge">FOUNDER</span>` : (this.friends.includes(d.u) ? `<span class="friend-label">[FRIEND]</span>` : "");
+                let t = this.isRoot ? `<span style="color:red; margin-left:10px; cursor:pointer;" onclick="Core.db.ref('chat/${key}').remove()">×</span>` : "";
                 r.innerHTML = `<div class="meta">${b}${d.u}${t}</div><div class="bubble">${d.t}</div>`;
                 f.appendChild(r); f.scrollTop = f.scrollHeight;
             },
