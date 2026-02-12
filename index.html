@@ -3,66 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RESONANCE GLOBAL V3</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@700;900&display=swap" rel="stylesheet">
+    <title>RESONANCE | GLOBAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #050505; --glass: rgba(20, 20, 20, 0.7); --border: 1px solid rgba(255,255,255,0.08); --accent: #32d74b; --danger: #ff453a; --text: #eee; }
+        :root { --bg: #000; --card: #0a0a0a; --text: #fff; --border: 1px solid rgba(255,255,255,0.1); --danger: #ff453a; --success: #32d74b; --offline: #444; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { height: 100dvh; background: radial-gradient(circle at top left, #1a1a1a, #000); color: var(--text); font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        body { height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         
-        #app-core { 
-            width: 100%; height: 100%; display: flex; flex-direction: column; 
-            background: var(--glass); backdrop-filter: blur(20px); position: relative; overflow: hidden; 
-        }
-        @media (min-width: 600px) { #app-core { max-width: 420px; height: 90vh; border: var(--border); border-radius: 32px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); } }
+        #app-core { width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--card); position: relative; overflow: hidden; }
+        @media (min-width: 600px) { #app-core { max-width: 420px; height: 90vh; border: var(--border); border-radius: 28px; } }
 
-        /* HEADER */
-        header { height: 70px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: var(--border); z-index: 10; }
-        .logo { font-family: 'Outfit'; font-weight: 900; font-size: 20px; letter-spacing: -1px; background: linear-gradient(90deg, #fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
-        /* AVATARS */
-        .avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; color: #fff; margin-right: 10px; flex-shrink: 0; text-transform: uppercase; }
-        
-        /* CHAT FEED */
-        #feed { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 12px; scroll-behavior: smooth; }
-        .msg-wrap { display: flex; align-items: flex-end; max-width: 85%; animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        .msg-wrap.mine { align-self: flex-end; flex-direction: row-reverse; }
-        .msg-wrap.mine .avatar { margin-right: 0; margin-left: 10px; display: none; } /* Hide own avatar */
-        
-        .bubble { padding: 12px 16px; font-size: 15px; line-height: 1.4; border-radius: 22px; position: relative; word-wrap: break-word; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .msg-wrap.mine .bubble { background: #fff; color: #000; border-radius: 22px 22px 4px 22px; }
-        .msg-wrap:not(.mine) .bubble { background: #1f1f1f; color: #fff; border-radius: 22px 22px 22px 4px; border: var(--border); }
-        
-        .meta-info { position: absolute; top: -18px; font-size: 9px; color: #666; font-weight: 700; white-space: nowrap; display: flex; align-items: center; gap: 5px; }
-        .msg-wrap.mine .meta-info { right: 0; }
-        .msg-wrap:not(.mine) .meta-info { left: 0; }
+        /* HEADER & FOOTER */
+        header, .footer { height: 70px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; background: rgba(10,10,10,0.95); z-index: 100; border-bottom: 1px solid #1a1a1a; }
+        .footer { border-bottom: none; border-top: 1px solid #1a1a1a; background: #0a0a0a; gap: 12px; }
 
-        /* BADGES */
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 8px; font-weight: 900; letter-spacing: 0.5px; }
-        .badge-founder { background: linear-gradient(135deg, #ff9f0a, #ff453a); color: #fff; box-shadow: 0 0 10px rgba(255, 69, 58, 0.4); }
-        .badge-friend { background: rgba(50, 215, 75, 0.2); color: var(--accent); border: 1px solid rgba(50, 215, 75, 0.3); }
+        /* POPUP */
+        #request-popup { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); background: #fff; color: #000; padding: 12px 18px; border-radius: 18px; z-index: 150; display: none; align-items: center; justify-content: space-between; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        #request-popup.active { display: flex; animation: slideIn 0.3s ease forwards; }
 
-        /* FOOTER & TYPING */
-        .footer { border-top: var(--border); padding: 15px; background: rgba(10,10,10,0.8); backdrop-filter: blur(10px); display: flex; gap: 10px; position: relative; }
-        #typing-indicator { position: absolute; top: -25px; left: 20px; font-size: 10px; color: #888; font-weight: 600; opacity: 0; transition: 0.3s; }
-        #typing-indicator.show { opacity: 1; transform: translateY(-5px); }
-        
-        .input-box { flex: 1; background: #161616; border: var(--border); padding: 0 20px; border-radius: 25px; color: #fff; height: 48px; font-size: 15px; transition: 0.3s; }
-        .input-box:focus { border-color: #444; box-shadow: 0 0 0 4px rgba(255,255,255,0.05); }
-        .send-btn { width: 48px; height: 48px; border-radius: 50%; background: #fff; color: #000; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+        .icon-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: #fff; cursor: pointer; }
+        .send-btn { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #000; border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
         .send-btn:active { transform: scale(0.9); }
 
+        /* FEED */
+        #feed { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 10px; }
+        .msg-wrap { display: flex; flex-direction: column; max-width: 80%; animation: popIn 0.3s ease; }
+        .msg-wrap.mine { align-self: flex-end; align-items: flex-end; }
+        .bubble { padding: 12px 16px; font-size: 15px; border-radius: 20px; line-height: 1.4; word-wrap: break-word; }
+        .msg-wrap.mine .bubble { background: #fff; color: #000; border-radius: 20px 20px 4px 20px; }
+        .msg-wrap:not(.mine) .bubble { background: #1a1a1a; color: #fff; border-radius: 20px 20px 20px 4px; }
+        
+        .meta { font-size: 9px; color: #555; margin-bottom: 4px; padding: 0 8px; text-transform: uppercase; display: flex; align-items: center; }
+        .founder-badge { background: linear-gradient(90deg, #ff453a, #ff9f0a); color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 8px; margin-right: 5px; }
+        .friend-badge { color: var(--success); font-weight: 800; font-size: 8px; margin-right: 5px; }
+        .adm-btn { cursor: pointer; font-weight: 800; font-size: 9px; margin-left: 8px; color: var(--danger); }
+
         /* SIDEBAR */
-        #sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: 300px; background: #0a0a0a; border-right: var(--border); z-index: 100; transform: translateX(-100%); transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px; display: flex; flex-direction: column; }
-        #sidebar.open { transform: translateX(0); box-shadow: 50px 0 100px rgba(0,0,0,0.5); }
-        .friend-row { display: flex; align-items: center; padding: 12px; border-radius: 12px; background: rgba(255,255,255,0.03); margin-bottom: 8px; }
-        
-        /* AUTH */
-        #auth-gate { position: absolute; inset: 0; background: #000; z-index: 200; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
-        .auth-inp { background: #111; border: 1px solid #222; color: white; padding: 18px; border-radius: 16px; margin-bottom: 12px; width: 100%; font-size: 16px; text-align: center; }
-        .auth-btn { background: #fff; color: #000; border: none; padding: 18px; border-radius: 16px; font-weight: 800; width: 100%; cursor: pointer; font-size: 14px; letter-spacing: 1px; }
-        
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        #sidebar { position: absolute; left: -100%; top: 0; bottom: 0; width: 280px; background: #050505; border-right: var(--border); z-index: 200; transition: 0.3s ease; padding: 25px; display: flex; flex-direction: column; }
+        #sidebar.open { left: 0; }
+        .friend-item { display: flex; justify-content: space-between; background: #111; padding: 12px; border-radius: 14px; margin-bottom: 8px; border: 1px solid #222; align-items: center; font-size: 14px; }
+        .status-dot { width: 8px; height: 8px; background: var(--offline); border-radius: 50%; margin-right: 10px; }
+        .status-dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+
+        /* AUTH GATE */
+        #auth-gate { position: absolute; inset: 0; background: #000; z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
+        .input-std { background: #111; border: 1px solid #222; color: white; padding: 18px; border-radius: 16px; margin-bottom: 12px; width: 100%; font-size: 16px; }
+        .auth-step { display: none; width: 100%; } 
+        .auth-step.active { display: block; animation: popIn 0.3s; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.95); } }
         ::-webkit-scrollbar { width: 0; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -70,60 +60,50 @@
 </head>
 <body>
     <div id="app-core">
-        <div id="request-popup" style="position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: 90%; background: rgba(20,20,20,0.95); backdrop-filter: blur(10px); color: #fff; padding: 15px; border-radius: 20px; border: 1px solid #333; z-index: 150; display: none; align-items: center; justify-content: space-between; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
-            <div style="display: flex; align-items: center;">
-                <div class="avatar" id="req-avi" style="width: 24px; height: 24px; font-size: 10px; margin-right: 10px;">?</div>
-                <span id="req-text" style="font-size: 12px; font-weight: 700;">Request...</span>
-            </div>
-            <button onclick="Core.acceptFriend()" style="background:#fff; color:#000; border:none; padding:8px 16px; border-radius: 12px; font-size: 10px; font-weight: 900; cursor: pointer;">ACCEPT</button>
+        <div id="request-popup">
+            <span id="req-text" style="font-size: 12px; font-weight: 800;">Request...</span>
+            <button onclick="Core.acceptFriend()" style="background:#000; color:#fff; border:none; padding:8px 15px; border-radius:12px; font-size:10px; font-weight:800; cursor:pointer;">CONFIRM</button>
         </div>
 
         <div id="sidebar">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
-                <div class="logo">RESONANCE X</div>
-                <button onclick="Core.toggleMenu()" style="background:none; border:none; color:#555; font-size: 24px; cursor: pointer;">&times;</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                <div style="font-family:'Outfit'; font-size:20px; font-weight:800;">NETWORK</div>
+                <button onclick="Core.toggleMenu()" style="background:none; border:none; color:#666; font-size:24px;">×</button>
             </div>
-            
-            <div id="admin-zone" style="display:none; margin-bottom:20px; padding:15px; border:1px solid var(--danger); border-radius:16px; background: rgba(255, 69, 58, 0.05);">
-                <div style="font-size:10px; color:var(--danger); font-weight: 800; margin-bottom:10px; letter-spacing: 1px;">BANNED SOULS</div>
+            <div id="admin-zone" style="display:none; margin-bottom:20px; padding:10px; border:1px solid var(--danger); border-radius:12px;">
+                <div style="font-size:9px; color:#fff; margin-bottom:10px;">BANNED USERS:</div>
                 <div id="ban-list"></div>
             </div>
-
-            <div style="font-size: 10px; color: #555; font-weight: 700; margin-bottom: 10px; letter-spacing: 1px;">ADD CONNECTION</div>
-            <div style="display:flex; gap:10px; margin-bottom: 30px;">
-                <input type="text" id="f-input" style="flex:1; background:#161616; border:1px solid #222; padding:0 15px; border-radius:12px; color:#fff; font-size:12px; height: 40px;" placeholder="Nickname">
-                <button onclick="Core.requestFriend()" style="width: 40px; background:#fff; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">+</button>
+            <div style="display:flex; gap:8px;">
+                <input type="text" id="f-input" style="flex:1; background:#161616; border:1px solid #222; padding:10px 15px; border-radius:20px; color:#fff; font-size:12px;" placeholder="Nickname">
+                <button onclick="Core.requestFriend()" style="background:#fff; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer;">+</button>
             </div>
-
-            <div style="font-size: 10px; color: #555; font-weight: 700; margin-bottom: 10px; letter-spacing: 1px;">MY NETWORK</div>
-            <div id="f-list" style="flex:1; overflow-y:auto;"></div>
-            
-            <button onclick="Core.logout()" style="color:var(--danger); background:rgba(255, 69, 58, 0.1); border:none; font-weight:800; cursor:pointer; padding:15px; border-radius: 12px; margin-top: 10px;">DISCONNECT</button>
+            <div id="f-list" style="flex:1; margin-top:20px; overflow-y:auto;"></div>
+            <button onclick="Core.logout()" style="color:var(--danger); background:none; border:none; font-weight:800; cursor:pointer; padding:10px;">LOGOUT</button>
         </div>
 
         <div id="auth-gate">
-            <div style="text-align:center; margin-bottom:60px;">
-                <h1 style="font-family:'Outfit'; font-size:48px; margin:0; letter-spacing:-2px; background: linear-gradient(180deg, #fff, #444); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">RESONANCE</h1>
-                <div style="color:#444; letter-spacing:4px; font-size: 9px; text-transform:uppercase; margin-top:10px; font-weight:800;">Secure Global Network</div>
+            <div style="text-align:center; margin-bottom:40px;">
+                <h1 style="font-family:'Outfit'; font-size:42px; margin:0; letter-spacing:-2px;">RESONANCE</h1>
+                <div style="color:#555; letter-spacing:2px; font-size:10px; text-transform:uppercase; margin-top:8px; font-weight:600;">Always in touch</div>
             </div>
-
             <div id="step-1" class="auth-step active">
-                <input type="text" id="nick-field" class="auth-inp" placeholder="Identity Name">
-                <button onclick="Auth.checkUser()" class="auth-btn">VERIFY IDENTITY</button>
+                <input type="text" id="nick-field" class="input-std" placeholder="Identity Nickname">
+                <button onclick="Auth.checkUser()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">NEXT</button>
             </div>
             <div id="step-login" class="auth-step">
-                <input type="password" id="login-pass" class="auth-inp" placeholder="Access Code">
-                <button onclick="Auth.doLogin()" class="auth-btn">ESTABLISH LINK</button>
-                <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:15px; font-size: 12px;">Cancel</button>
+                <input type="password" id="login-pass" class="input-std" placeholder="Password">
+                <button onclick="Auth.doLogin()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">LOGIN</button>
+                <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:10px;">Back</button>
             </div>
             <div id="step-register" class="auth-step">
-                <input type="password" id="reg-pass1" class="auth-inp" placeholder="Create Code (min 8)">
-                <input type="password" id="reg-pass2" class="auth-inp" placeholder="Repeat Code">
-                <button onclick="Auth.doRegister()" class="auth-btn">INITIALIZE</button>
-                <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:15px; font-size: 12px;">Cancel</button>
+                <input type="password" id="reg-pass1" class="input-std" placeholder="Create Password (min 8)">
+                <input type="password" id="reg-pass2" class="input-std" placeholder="Confirm Password">
+                <button onclick="Auth.doRegister()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">START NETWORK</button>
+                <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:10px;">Back</button>
             </div>
-            <div style="position: absolute; bottom: 30px; left: 0; width: 100%; text-align: center; opacity: 0.3;">
-                <a href="https://t.me/Exynos2600" target="_blank" style="color: #fff; text-decoration: none; font-size: 10px; font-family: monospace;">SYSTEM SUPPORT: @Exynos2600</a>
+            <div style="margin-top: 50px; text-align: center; opacity: 0.3;">
+                <a href="https://t.me/Exynos2600" target="_blank" style="color: #fff; text-decoration: none; font-size: 11px;">feedback Telegram: @Exynos2600</a>
             </div>
         </div>
 
@@ -131,8 +111,8 @@
             <button class="icon-btn" onclick="Core.toggleMenu()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <div class="logo">RESONANCE</div>
-            <div style="width:44px; display: flex; justify-content: center;">
+            <div style="font-family:'Outfit'; font-weight:800; letter-spacing:-0.5px; font-size:18px;">RESONANCE GLOBAL</div>
+            <div style="width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
                 <div id="conn-status" style="width:8px; height:8px; background:#32d74b; border-radius:50%; box-shadow:0 0 10px #32d74b;"></div>
             </div>
         </header>
@@ -140,41 +120,28 @@
         <div id="feed"></div>
 
         <div class="footer">
-            <div id="typing-indicator">Someone is typing...</div>
-            <input type="text" id="msg-input" class="input-box" placeholder="Broadcast..." autocomplete="off">
+            <input type="text" id="msg-input" style="flex:1; background:#161616; border:1px solid #222; padding:0 20px; border-radius:25px; color:#fff; height:44px;" placeholder="Write message..." autocomplete="off">
             <button id="send-btn" onclick="Core.send()" class="send-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
             </button>
         </div>
     </div>
 
-    <audio id="sound-pop" src="https://assets.mixkit.co/active_storage/sfx/2346/2346-preview.m4a"></audio>
-
     <script>
         const CFG = { apiKey: "AIzaSyAmZnFT9sYDL7XFnbKqupwBIPC4zsoyIrk", dbURL: "https://resonance---chat-default-rtdb.firebaseio.com", admin: "Workstation5495", hash: "UlRXNTQ5NUpFTExZQkVBTg==" };
         
-        // --- UTILS: COLOR GENERATOR ---
-        const Utils = {
-            colors: ['#FF3B30', '#FF9500', '#FFCC00', '#34C759', '#00C7BE', '#30B0C7', '#32ADE6', '#007AFF', '#5856D6', '#AF52DE', '#FF2D55'],
-            getColor(name) {
-                let hash = 0; for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
-                return this.colors[Math.abs(hash) % this.colors.length];
-            },
-            getAvi(name) {
-                return `<div class="avatar" style="background:${this.getColor(name)}">${name.substring(0,2)}</div>`;
-            }
-        };
-
         const Auth = {
             tempNick: null,
             init() {
                 firebase.initializeApp({apiKey: CFG.apiKey, databaseURL: CFG.dbURL});
-                if(localStorage.getItem('res_user')) { Core.user = localStorage.getItem('res_user'); Core.isRoot = localStorage.getItem('res_root') === 'true'; Core.checkSecurity(); }
+                if(localStorage.getItem('res_user')) { 
+                    Core.user = localStorage.getItem('res_user'); Core.isRoot = localStorage.getItem('res_root') === 'true'; Core.checkSecurity(); 
+                }
             },
             reset() { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById('step-1').classList.add('active'); },
             checkUser() {
                 const n = document.getElementById('nick-field').value.trim();
-                if (n.length < 3) return alert("Nickname too short");
+                if (n.length < 3) return alert("Min 3 chars");
                 this.tempNick = n;
                 firebase.database().ref('users/' + n).once('value', s => {
                     if (s.exists()) this.showStep('step-login'); else this.showStep('step-register');
@@ -183,7 +150,7 @@
             showStep(id) { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById(id).classList.add('active'); },
             doRegister() {
                 const p1 = document.getElementById('reg-pass1').value, p2 = document.getElementById('reg-pass2').value;
-                if (p1.length < 8) return alert("Weak Password (min 8)");
+                if (p1.length < 8) return alert("Min 8 symbols");
                 if (p1 !== p2) return alert("Mismatch");
                 firebase.database().ref('users/' + this.tempNick).set({ pass: btoa(p1), joined: Date.now() }).then(() => this.finalizeLogin(this.tempNick, false));
             },
@@ -191,18 +158,17 @@
                 const p = document.getElementById('login-pass').value;
                 if (this.tempNick === CFG.admin && btoa(p) === CFG.hash) return this.finalizeLogin(this.tempNick, true);
                 firebase.database().ref('users/' + this.tempNick).once('value', s => {
-                    const ud = s.val(); if (ud && ud.pass === btoa(p)) this.finalizeLogin(this.tempNick, false); else alert("Invalid Code");
+                    const ud = s.val(); if (ud && ud.pass === btoa(p)) this.finalizeLogin(this.tempNick, false); else alert("Wrong Pass");
                 });
             },
             finalizeLogin(nick, isRoot) { Core.user = nick; Core.isRoot = isRoot; localStorage.setItem('res_user', nick); localStorage.setItem('res_root', isRoot); Core.checkSecurity(); }
         };
 
         const Core = {
-            db: null, user: null, isRoot: false, friends: [], activeReqKey: null, lastSentTime: 0, typingTimeout: null,
-            
+            db: null, user: null, isRoot: false, friends: [], activeReqKey: null, lastSentTime: 0,
             checkSecurity() {
                 firebase.database().ref("banned/" + this.user).once('value', sn => {
-                    if (sn.exists()) { localStorage.clear(); alert("ACCESS REVOKED"); location.reload(); } else { document.getElementById('auth-gate').style.display = "none"; this.initApp(); }
+                    if (sn.exists()) { localStorage.clear(); alert("BANNED"); location.reload(); } else { document.getElementById('auth-gate').style.display = "none"; this.initApp(); }
                 });
             },
             initApp() {
@@ -211,44 +177,19 @@
                 this.db.ref("status/" + this.user).set("online");
                 this.db.ref("kicks/" + this.user).on("value", s => { if(s.exists()) { this.db.ref("kicks/" + this.user).remove(); localStorage.clear(); location.reload(); } });
 
-                // Friends Sync
+                // HARD SYNC FRIENDS
                 this.db.ref("users/" + this.user + "/friends").on('value', s => {
                     this.friends = s.val() ? Object.keys(s.val()) : [];
                     this.renderFriends();
-                    this.refreshChat();
+                    const f = document.getElementById('feed'); f.innerHTML = "";
+                    this.db.ref("chat").limitToLast(40).once('value', shot => shot.forEach(c => this.renderMsg(c.key, c.val())));
                 });
 
-                // Chat Sync
-                this.db.ref("chat").limitToLast(1).on("child_added", (s) => {
-                    this.renderMsg(s.key, s.val());
-                    if (s.val().u !== this.user && s.val().type !== "req") document.getElementById('sound-pop').play().catch(()=>{});
-                });
+                this.db.ref("chat").limitToLast(1).on("child_added", (s) => this.renderMsg(s.key, s.val()));
                 this.db.ref("chat").on("child_removed", s => document.getElementById(s.key)?.remove());
-
-                // Typing Listener
-                this.db.ref("typing").on("value", s => {
-                    const d = s.val();
-                    let typingUsers = [];
-                    if(d) Object.keys(d).forEach(u => { if(u !== this.user) typingUsers.push(u); });
-                    const ind = document.getElementById('typing-indicator');
-                    if(typingUsers.length > 0) { ind.innerText = typingUsers.join(', ') + " is typing..."; ind.classList.add('show'); }
-                    else { ind.classList.remove('show'); }
-                });
-
-                // Input Logic
-                const inp = document.getElementById('msg-input');
-                inp.onkeypress = (e) => { if (e.key === 'Enter') this.send(); };
-                inp.oninput = () => {
-                    this.db.ref("typing/" + this.user).set(true);
-                    clearTimeout(this.typingTimeout);
-                    this.typingTimeout = setTimeout(() => this.db.ref("typing/" + this.user).remove(), 2000);
-                };
-
+                
                 if(this.isRoot) this.loadAdmin();
-            },
-            refreshChat() {
-                const f = document.getElementById('feed'); f.innerHTML = "";
-                this.db.ref("chat").limitToLast(40).once('value', shot => shot.forEach(c => this.renderMsg(c.key, c.val())));
+                document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); };
             },
             requestFriend() {
                 const t = document.getElementById('f-input').value.trim();
@@ -259,7 +200,11 @@
             acceptFriend() {
                 const fromU = document.getElementById('req-text').dataset.from;
                 if(fromU && this.activeReqKey) {
-                    let u = {}; u[`users/${this.user}/friends/${fromU}`] = true; u[`users/${fromU}/friends/${this.user}`] = true; u[`chat/${this.activeReqKey}`] = null;
+                    // ATOMIC WRITE
+                    let u = {}; 
+                    u[`users/${this.user}/friends/${fromU}`] = true; 
+                    u[`users/${fromU}/friends/${this.user}`] = true; 
+                    u[`chat/${this.activeReqKey}`] = null;
                     this.db.ref().update(u);
                 }
                 document.getElementById('request-popup').classList.remove('active');
@@ -267,19 +212,18 @@
             renderFriends() {
                 const l = document.getElementById('f-list'); l.innerHTML = "";
                 this.friends.forEach(f => {
-                    const d = document.createElement('div'); d.className = 'friend-row';
-                    d.innerHTML = `${Utils.getAvi(f)} <div style="flex:1; font-weight:700;">${f} <div id="st-${f}" class="status-dot"></div></div> <span onclick="Core.remF('${f}')" style="color:#666; cursor:pointer;">×</span>`;
+                    const d = document.createElement('div'); d.className = 'friend-item';
+                    d.innerHTML = `<div style="display:flex; align-items:center;"><div id="st-${f}" class="status-dot"></div>${f}</div><span onclick="Core.remF('${f}')" style="color:red; cursor:pointer; font-weight:800;">×</span>`;
                     l.appendChild(d);
                     this.db.ref("status/" + f).on('value', snap => { const el = document.getElementById('st-' + f); if(el) el.className = `status-dot ${snap.val() === 'online' ? 'online' : ''}`; });
                 });
             },
-            remF(n) { if(confirm("Disconnect?")) { let u = {}; u[`users/${this.user}/friends/${n}`] = null; u[`users/${n}/friends/${this.user}`] = null; this.db.ref().update(u); } },
+            remF(n) { if(confirm("Remove?")) { let u = {}; u[`users/${this.user}/friends/${n}`] = null; u[`users/${n}/friends/${this.user}`] = null; this.db.ref().update(u); } },
             send() {
                 const now = Date.now();
                 if (now - this.lastSentTime < 3000) return;
                 let t = document.getElementById('msg-input').value.trim(); if (!t) return;
                 this.lastSentTime = now;
-                this.db.ref("typing/" + this.user).remove();
                 this.db.ref("chat").push({ u: this.user, t: t, r: this.isRoot, ts: Date.now() });
                 document.getElementById('msg-input').value = "";
             },
@@ -287,34 +231,26 @@
                 if (document.getElementById(key)) return; 
                 if (d.type === "req" && d.to === this.user) {
                     if (this.friends.includes(d.from)) { this.db.ref("chat").child(key).remove(); return; }
-                    this.activeReqKey = key; document.getElementById('req-text').innerText = `Connect with ${d.from}?`;
+                    this.activeReqKey = key; document.getElementById('req-text').innerText = `@${d.from} wants friend!`;
                     document.getElementById('req-text').dataset.from = d.from;
-                    document.getElementById('req-avi').style.background = Utils.getColor(d.from);
-                    document.getElementById('req-avi').innerText = d.from.substring(0,2);
                     document.getElementById('request-popup').classList.add('active'); return; 
                 }
                 if (d.type === "req") return; 
                 const f = document.getElementById('feed'); const r = document.createElement('div'); r.id = key; r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
-                
-                let b = d.r ? `<span class="badge badge-founder">FOUNDER</span>` : (this.friends.includes(d.u) ? `<span class="badge badge-friend">FRIEND</span>` : "");
-                let t = this.isRoot ? `<span class="adm-btn" onclick="Core.db.ref('chat/${key}').remove()">DEL</span> <span class="adm-btn" onclick="Core.ban('${d.u}')">BAN</span> <span class="adm-btn" onclick="Core.kick('${d.u}')">KICK</span>` : "";
-                
-                r.innerHTML = `${Utils.getAvi(d.u)} 
-                    <div style="position:relative">
-                        <div class="meta-info">${b} ${d.u} ${t}</div>
-                        <div class="bubble">${d.t}</div>
-                    </div>`;
+                let b = d.r ? `<span class="founder-badge">FOUNDER</span>` : (this.friends.includes(d.u) ? `<span class="friend-badge">[FRIEND]</span>` : "");
+                let t = this.isRoot ? `<span class="adm-btn" onclick="Core.db.ref('chat/${key}').remove()">DEL</span> <span class="adm-btn" onclick="Core.ban('${d.u}')">BAN</span> <span class="adm-btn" style="color:orange" onclick="Core.kick('${d.u}')">KICK</span>` : "";
+                r.innerHTML = `<div class="meta">${b}${d.u}${t}</div><div class="bubble">${d.t}</div>`;
                 f.appendChild(r); f.scrollTop = f.scrollHeight;
             },
             loadAdmin() {
                 document.getElementById('admin-zone').style.display = 'block';
                 this.db.ref("banned").on('value', sn => {
                     const l = document.getElementById('ban-list'); l.innerHTML = "";
-                    if(sn.val()) Object.keys(sn.val()).forEach(k => { l.innerHTML += `<div style="color:var(--danger); font-size:10px; margin-bottom:5px; font-weight:700;">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer; opacity:0.5;">[UNBAN]</span></div>`; });
+                    if(sn.val()) Object.keys(sn.val()).forEach(k => { l.innerHTML += `<div style="color:red; font-size:10px; margin-bottom:5px;">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer;">[UNBAN]</span></div>`; });
                 });
             },
             unban(u) { if(confirm("Unban?")) this.db.ref("banned/" + u).remove(); },
-            ban(u) { if(confirm("BAN FOREVER?")) this.db.ref("banned/" + u).set(true); },
+            ban(u) { if(confirm("BAN?")) this.db.ref("banned/" + u).set(true); },
             kick(u) { if(confirm("Kick?")) this.db.ref("kicks/" + u).set(Date.now()); },
             toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
             logout() { localStorage.clear(); location.reload(); }
