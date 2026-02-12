@@ -13,8 +13,8 @@
         #app-core { width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--card); position: relative; overflow: hidden; }
         @media (min-width: 600px) { #app-core { max-width: 420px; height: 90vh; border: var(--border); border-radius: 28px; box-shadow: 0 40px 80px rgba(0,0,0,0.8); } }
 
-        /* SIDEBAR (FRIENDS & MENU) */
-        #sidebar { position: absolute; left: -280px; top: 0; bottom: 0; width: 280px; background: #050505; border-right: var(--border); z-index: 50; transition: 0.4s cubic-bezier(0.8, 0, 0.2, 1); padding: 25px; display: flex; flex-direction: column; }
+        /* SIDEBAR */
+        #sidebar { position: absolute; left: -280px; top: 0; bottom: 0; width: 280px; background: #050505; border-right: var(--border); z-index: 60; transition: 0.4s cubic-bezier(0.8, 0, 0.2, 1); padding: 25px; display: flex; flex-direction: column; }
         #sidebar.open { left: 0; box-shadow: 20px 0 50px rgba(0,0,0,0.5); }
         .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .sidebar-title { font-family: 'Outfit'; font-size: 20px; font-weight: 800; }
@@ -23,31 +23,37 @@
         .friend-item { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 12px; border-radius: 14px; margin-bottom: 8px; font-size: 14px; border: 1px solid #222; }
         .online-dot { width: 8px; height: 8px; background: #32d74b; border-radius: 50%; margin-right: 10px; }
 
+        /* REQUEST NOTIFICATION */
+        #request-popup { 
+            position: absolute; top: 80px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            width: 90%; background: #fff; color: #000; padding: 15px; border-radius: 20px;
+            z-index: 100; display: none; align-items: center; justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); font-weight: 600; font-size: 13px;
+        }
+        #request-popup.active { display: flex; animation: slideIn 0.3s forwards; }
+
         /* AUTH GATE */
         #auth-gate { position: absolute; inset: 0; background: #000; z-index: 100; display: flex; flex-direction: column; justify-content: center; padding: 40px; transition: 0.8s; }
-        .input-std { background: #111; border: 1px solid #222; color: white; padding: 18px; border-radius: 16px; font-size: 16px; margin-bottom: 12px; }
-        .btn-main { background: white; color: black; border: none; padding: 18px; border-radius: 16px; font-weight: 800; font-size: 14px; cursor: pointer; text-transform: uppercase; }
+        .input-std { background: #111; border: 1px solid #222; color: white; padding: 18px; border-radius: 16px; font-size: 16px; margin-bottom: 12px; width: 100%; }
+        .btn-main { background: white; color: black; border: none; padding: 18px; border-radius: 16px; font-weight: 800; font-size: 14px; cursor: pointer; text-transform: uppercase; width: 100%; }
 
-        /* HEADER */
-        header { padding: 15px 20px; background: rgba(10,10,10,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        .menu-btn { cursor: pointer; color: var(--text); background: none; border: none; }
-
-        /* CHAT FEED */
-        #feed { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 10px; }
-        .msg-wrap { display: flex; flex-direction: column; max-width: 85%; animation: popIn 0.3s ease; }
+        /* HEADER & FOOTER (SYMMETRY) */
+        header { padding: 18px 20px; background: rgba(10,10,10,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        .footer { padding: 18px 20px; background: #0a0a0a; border-top: 1px solid #1a1a1a; display: flex; gap: 12px; align-items: center; }
+        
+        #feed { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .msg-wrap { display: flex; flex-direction: column; max-width: 80%; animation: popIn 0.3s ease; }
         .msg-wrap.mine { align-self: flex-end; align-items: flex-end; }
-        .bubble { padding: 12px 16px; font-size: 15px; border-radius: 20px; line-height: 1.4; word-wrap: break-word; }
-        .msg-wrap.mine .bubble { background: #fff; color: #000; border-radius: 20px 20px 4px 20px; }
-        .msg-wrap:not(.mine) .bubble { background: #1a1a1a; color: #fff; border-radius: 20px 20px 20px 4px; }
-        .meta { font-size: 9px; color: #555; margin-bottom: 4px; padding: 0 5px; display: flex; gap: 8px; }
+        .bubble { padding: 12px 18px; font-size: 15px; border-radius: 22px; line-height: 1.4; word-wrap: break-word; }
+        .msg-wrap.mine .bubble { background: #fff; color: #000; border-radius: 22px 22px 4px 22px; }
+        .msg-wrap:not(.mine) .bubble { background: #1a1a1a; color: #fff; border-radius: 22px 22px 22px 4px; }
+        .meta { font-size: 9px; color: #555; margin-bottom: 4px; padding: 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-        /* FOOTER */
-        .footer { padding: 15px; background: #0a0a0a; border-top: 1px solid #1a1a1a; display: flex; gap: 10px; align-items: center; }
-        .input-msg { flex: 1; background: #161616; border: 1px solid #222; padding: 12px 20px; border-radius: 25px; color: white; }
-        .send-btn { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .input-msg { flex: 1; background: #161616; border: 1px solid #222; padding: 12px 20px; border-radius: 25px; color: white; font-size: 14px; }
+        .send-btn { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 
-        @keyframes popIn { from { opacity: 0; transform: scale(0.95); } }
-        ::-webkit-scrollbar { width: 0px; }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.95) translateY(5px); } }
+        @keyframes slideIn { to { transform: translateX(-50%) translateY(0); } }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -55,6 +61,11 @@
 <body>
     <div id="app-core">
         
+        <div id="request-popup">
+            <span id="req-text">Requesting...</span>
+            <button onclick="Core.acceptFriend()" style="background:#000; color:#fff; border:none; padding:8px 15px; border-radius:12px; font-size:11px; font-weight:800; cursor:pointer;">CONFIRM</button>
+        </div>
+
         <div id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-title">NETWORK</div>
@@ -62,18 +73,16 @@
             </div>
             
             <div style="display:flex; gap:8px;">
-                <input type="text" id="f-input" class="input-msg" style="font-size:12px; padding:10px;" placeholder="Add Nickname">
-                <button onclick="Core.addFriend()" style="background:#fff; border:none; border-radius:50%; width:32px; height:32px; font-weight:bold;">+</button>
+                <input type="text" id="f-input" class="input-msg" style="font-size:12px; padding:10px;" placeholder="Add Friend">
+                <button onclick="Core.requestFriend()" style="background:#fff; border:none; border-radius:50%; width:32px; height:32px; font-weight:bold;">+</button>
             </div>
-
             <div id="f-list"></div>
-
             <button onclick="Core.logout()" style="margin-top:auto; background:rgba(255,69,58,0.1); color:var(--danger); border:none; padding:15px; border-radius:14px; font-weight:800; cursor:pointer;">EXIT SYSTEM</button>
         </div>
 
         <div id="auth-gate">
             <h1 style="font-family:'Outfit'; font-size:42px; margin:0; letter-spacing:-2px;">RESONANCE</h1>
-            <p style="color:#333; letter-spacing:3px; font-size:10px; margin-bottom:40px; text-transform:uppercase;">v1.2.2</p>
+            <p style="color:#333; letter-spacing:3px; font-size:10px; margin-bottom:40px; text-transform:uppercase;">Authority v1.2.3</p>
             <input type="text" id="nick-field" class="input-std" placeholder="Identity Nickname" maxlength="15">
             <input type="password" id="pass-field" class="input-std" placeholder="Admin Token" style="display:none">
             <button onclick="Core.login()" class="btn-main">INITIALIZE</button>
@@ -106,28 +115,24 @@
             hash: "UlRXNTQ5NUpFTExZQkVBTg=="
         };
 
-        const BAD_WORDS = ["fuck", "bitch", "bitch", "dick ", "cunt", "bastard", "БЛЯДЬ", "ЕБАТЬ", "ПИЗДА", "ХУЙ", "ЗАЕБАЛ", "EБАЛ"]; // Добавь свои сюда
+        const BAD_WORDS = ["fuck", "bitch", "dick", "cunt", "bastard", "БЛЯДЬ", "ЕБАТЬ", "ПИЗДА", "ХУЙ", "ЗАЕБАЛ", "EБАЛ"];
 
         const Core = {
-            db: null, user: null, isRoot: false, friends: [],
+            db: null, user: null, isRoot: false, friends: [], pendingFriend: null,
             init() {
                 firebase.initializeApp(CONFIG);
                 this.db = firebase.database();
                 this.friends = JSON.parse(localStorage.getItem('res_friends_v2') || "[]");
-                
                 const s = localStorage.getItem('res_core_user');
                 if (s) { this.user = s; this.isRoot = localStorage.getItem('res_core_root') === 'true'; this.open(); }
-                
                 document.getElementById('nick-field').oninput = (e) => { 
                     document.getElementById('pass-field').style.display = (e.target.value === CONFIG.admin) ? 'block' : 'none'; 
                 };
                 document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); };
             },
-            
             login() {
                 const n = document.getElementById('nick-field').value.trim();
                 if (n.length < 3 || !/^[A-Za-z0-9_]+$/.test(n)) return alert("SECURITY: Invalid Nickname");
-                
                 if (n === CONFIG.admin) {
                     if (btoa(document.getElementById('pass-field').value) === CONFIG.hash) { 
                         this.isRoot = true; localStorage.setItem('res_core_root', 'true'); 
@@ -135,21 +140,26 @@
                 }
                 this.user = n; localStorage.setItem('res_core_user', n); this.open();
             },
-
             open() { document.getElementById('auth-gate').style.display = "none"; this.sync(); this.renderFriends(); },
             toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
             logout() { if(confirm("Terminate session?")) { localStorage.clear(); location.reload(); } },
             
-            addFriend() {
-                const n = document.getElementById('f-input').value.trim();
-                if (n && !this.friends.includes(n)) {
-                    this.friends.push(n);
+            // FRIEND REQUEST SYSTEM
+            requestFriend() {
+                const target = document.getElementById('f-input').value.trim();
+                if (!target || target === this.user) return;
+                this.db.ref("chat").push({ u: "SYSTEM", t: `Hey! @${this.user} wants to be friends with @${target}!`, type: "req", from: this.user, to: target });
+                document.getElementById('f-input').value = "";
+                this.toggleMenu();
+            },
+            acceptFriend() {
+                if (this.pendingFriend && !this.friends.includes(this.pendingFriend)) {
+                    this.friends.push(this.pendingFriend);
                     localStorage.setItem('res_friends_v2', JSON.stringify(this.friends));
                     this.renderFriends();
                 }
-                document.getElementById('f-input').value = "";
+                document.getElementById('request-popup').classList.remove('active');
             },
-            removeFriend(n) { this.friends = this.friends.filter(f => f !== n); localStorage.setItem('res_friends_v2', JSON.stringify(this.friends)); this.renderFriends(); },
             renderFriends() {
                 const l = document.getElementById('f-list'); l.innerHTML = "";
                 this.friends.forEach(f => {
@@ -159,13 +169,13 @@
                     </div>`;
                 });
             },
-
+            removeFriend(n) { this.friends = this.friends.filter(f => f !== n); localStorage.setItem('res_friends_v2', JSON.stringify(this.friends)); this.renderFriends(); },
+            
             censor(text) {
                 let clean = text;
                 BAD_WORDS.forEach(word => { clean = clean.replace(new RegExp(word, "gi"), "***"); });
                 return clean;
             },
-
             send() {
                 const i = document.getElementById('msg-input');
                 let t = i.value.trim();
@@ -173,14 +183,24 @@
                 this.db.ref("chat").push({ u: this.user, t: this.censor(t), r: this.isRoot, ts: Date.now() });
                 i.value = "";
             },
-
             sync() {
-                this.db.ref("chat").limitToLast(50).on("child_added", (s) => {
-                    const d = s.val(); const f = document.getElementById('feed');
-                    const r = document.createElement('div'); r.id = s.key;
-                    r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
-                    r.innerHTML = `<div class="meta">${d.u} ${this.isRoot ? `<span onclick="Core.drop('${s.key}')" style="color:red; cursor:pointer;">DEL</span>` : ''}</div><div class="bubble">${d.t}</div>`;
-                    f.appendChild(r); f.scrollTop = f.scrollHeight;
+                this.db.ref("chat").limitToLast(40).on("child_added", (s) => {
+                    const d = s.val();
+                    // Catch Friend Request
+                    if (d.type === "req" && d.to === this.user) {
+                        this.pendingFriend = d.from;
+                        document.getElementById('req-text').innerText = `@${d.from} wants to be friends!`;
+                        document.getElementById('request-popup').classList.add('active');
+                        setTimeout(() => document.getElementById('request-popup').classList.remove('active'), 10000);
+                    }
+                    
+                    if (d.type !== "req") {
+                        const f = document.getElementById('feed');
+                        const r = document.createElement('div'); r.id = s.key;
+                        r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
+                        r.innerHTML = `<div class="meta">${d.u} ${this.isRoot ? `<span onclick="Core.drop('${s.key}')" style="color:red; cursor:pointer;">DEL</span>` : ''}</div><div class="bubble">${d.t}</div>`;
+                        f.appendChild(r); f.scrollTop = f.scrollHeight;
+                    }
                 });
                 this.db.ref("chat").on("child_removed", (s) => document.getElementById(s.key)?.remove());
             },
