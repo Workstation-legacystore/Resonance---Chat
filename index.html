@@ -13,10 +13,11 @@
         @media (min-width: 600px) { #app-core { max-width: 420px; height: 90vh; border: var(--border); border-radius: 28px; } }
         header, .footer { height: 70px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; background: rgba(10,10,10,0.95); z-index: 100; border-bottom: 1px solid #1a1a1a; }
         .footer { border-bottom: none; border-top: 1px solid #1a1a1a; background: #0a0a0a; gap: 12px; }
-        #request-popup { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 18px; border: 1px solid #333; z-index: 150; display: none; align-items: center; justify-content: space-between; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+        #request-popup { position: absolute; top: 80px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); background: #fff; color: #000; padding: 12px 18px; border-radius: 18px; z-index: 150; display: none; align-items: center; justify-content: space-between; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
         #request-popup.active { display: flex; animation: slideIn 0.3s ease forwards; }
         .icon-btn { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: none; border: none; color: #fff; cursor: pointer; }
-        .send-btn { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #000; border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; }
+        .send-btn { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #000; border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; transition: 0.2s; }
+        .send-btn:disabled { background: #333; color: #666; cursor: not-allowed; }
         #feed { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 10px; }
         .msg-wrap { display: flex; flex-direction: column; max-width: 80%; animation: popIn 0.3s ease; }
         .msg-wrap.mine { align-self: flex-end; align-items: flex-end; }
@@ -27,7 +28,7 @@
         .founder-badge { background: linear-gradient(90deg, #ff453a, #ff9f0a); color: #fff; padding: 2px 8px; border-radius: 6px; font-weight: 900; font-size: 8px; margin-right: 5px; }
         #sidebar { position: absolute; left: -100%; top: 0; bottom: 0; width: 280px; background: #050505; border-right: var(--border); z-index: 200; transition: 0.3s ease; padding: 25px; display: flex; flex-direction: column; }
         #sidebar.open { left: 0; }
-        .friend-item { display: flex; justify-content: space-between; background: #111; padding: 12px; border-radius: 14px; margin-bottom: 8px; border: 1px solid #222; align-items: center; }
+        .friend-item { display: flex; justify-content: space-between; background: #111; padding: 12px; border-radius: 14px; margin-bottom: 8px; border: 1px solid #222; align-items: center; font-size: 14px; }
         .status-dot { width: 8px; height: 8px; background: var(--offline); border-radius: 50%; margin-right: 10px; }
         .status-dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
         #auth-gate { position: absolute; inset: 0; background: #000; z-index: 300; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
@@ -36,7 +37,6 @@
         .auth-step.active { display: block; animation: popIn 0.3s; }
         @keyframes slideIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
         @keyframes popIn { from { opacity: 0; transform: scale(0.95); } }
-        ::-webkit-scrollbar { width: 0; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
@@ -44,20 +44,16 @@
 <body>
     <div id="app-core">
         <div id="request-popup">
-            <span id="req-text" style="font-size: 12px; font-weight: 600;">Request...</span>
-            <button onclick="Core.acceptFriend()" style="background:#fff; color:#000; border:none; padding:6px 12px; border-radius:10px; font-size:10px; font-weight:800; cursor:pointer;">CONFIRM</button>
+            <span id="req-text" style="font-size: 12px; font-weight: 800;">Request...</span>
+            <button onclick="Core.acceptFriend()" style="background:#000; color:#fff; border:none; padding:8px 15px; border-radius:12px; font-size:10px; font-weight:800; cursor:pointer;">CONFIRM</button>
         </div>
         <div id="sidebar">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
                 <div style="font-family:'Outfit'; font-size:20px; font-weight:800;">GLOBAL</div>
                 <button onclick="Core.toggleMenu()" style="background:none; border:none; color:#666; font-size:24px;">×</button>
             </div>
-            <div id="admin-zone" style="display:none; margin-bottom:20px; padding:10px; border:1px solid var(--danger); border-radius:12px;">
-                <div style="font-size:9px; color:#666; margin-bottom:5px;">ADMIN PANEL</div>
-                <div id="ban-list"></div>
-            </div>
             <div style="display:flex; gap:8px;">
-                <input type="text" id="f-input" style="flex:1; background:#161616; border:1px solid #222; padding:10px 15px; border-radius:20px; color:#fff; font-size:12px;" placeholder="Add Friend">
+                <input type="text" id="f-input" style="flex:1; background:#161616; border:1px solid #222; padding:10px 15px; border-radius:20px; color:#fff; font-size:12px;" placeholder="Nickname">
                 <button onclick="Core.requestFriend()" style="background:#fff; border:none; border-radius:50%; width:35px; height:35px; font-weight:bold; cursor:pointer;">+</button>
             </div>
             <div id="f-list" style="flex:1; margin-top:20px; overflow-y:auto;"></div>
@@ -69,8 +65,8 @@
                 <div style="color:#555; letter-spacing:2px; font-size:10px; text-transform:uppercase; margin-top:8px; font-weight:600;">Always in touch</div>
             </div>
             <div id="step-1" class="auth-step active">
-                <input type="text" id="nick-field" class="input-std" placeholder="Enter Nickname">
-                <button id="btn-check" onclick="Auth.checkUser()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">NEXT</button>
+                <input type="text" id="nick-field" class="input-std" placeholder="Identity Nickname">
+                <button onclick="Auth.checkUser()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">NEXT</button>
             </div>
             <div id="step-login" class="auth-step">
                 <input type="password" id="login-pass" class="input-std" placeholder="Password">
@@ -78,21 +74,20 @@
                 <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:10px;">Back</button>
             </div>
             <div id="step-register" class="auth-step">
-                <input type="password" id="reg-pass1" class="input-std" placeholder="New Password (8+ chars)">
+                <input type="password" id="reg-pass1" class="input-std" placeholder="Create Password (min 8)">
                 <input type="password" id="reg-pass2" class="input-std" placeholder="Confirm Password">
-                <button onclick="Auth.doRegister()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">CREATE ACCOUNT</button>
+                <button onclick="Auth.doRegister()" style="background:#fff; border:none; padding:18px; border-radius:16px; font-weight:800; width:100%; cursor:pointer;">START NETWORK</button>
                 <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:10px;">Back</button>
             </div>
-            <div style="margin-top: 50px; text-align: center; opacity: 0.4;">
-                <p style="font-size: 10px; letter-spacing: 1px; color: #fff; margin-bottom: 4px;">feetback</p>
-                <a href="https://t.me/Exynos2600" target="_blank" style="color: #fff; text-decoration: none; font-size: 12px; font-weight: 600;">Telegram: @Exynos2600</a>
+            <div style="margin-top: 50px; text-align: center; opacity: 0.3;">
+                <a href="https://t.me/Exynos2600" target="_blank" style="color: #fff; text-decoration: none; font-size: 11px;">feedback Telegram: @Exynos2600</a>
             </div>
         </div>
         <header>
             <button class="icon-btn" onclick="Core.toggleMenu()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
             </button>
-            <div style="font-family:'Outfit'; font-weight:800; letter-spacing:-0.5px; font-size:18px;">RESONANCE GLOBAL</div>
+            <div style="font-family:'Outfit'; font-weight:800; letter-spacing:-0.5px; font-size:18px;">RESONANCE V2.3.7</div>
             <div style="width:40px; height:40px; display:flex; align-items:center; justify-content:center;">
                 <div id="conn-status" style="width:8px; height:8px; background:#32d74b; border-radius:50%; box-shadow:0 0 10px #32d74b;"></div>
             </div>
@@ -100,21 +95,18 @@
         <div id="feed"></div>
         <div class="footer">
             <input type="text" id="msg-input" style="flex:1; background:#161616; border:1px solid #222; padding:0 20px; border-radius:25px; color:#fff; height:44px;" placeholder="Write message..." autocomplete="off">
-            <button onclick="Core.send()" class="send-btn">
+            <button id="send-btn" onclick="Core.send()" class="send-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
             </button>
         </div>
     </div>
     <script>
         const CFG = { apiKey: "AIzaSyAmZnFT9sYDL7XFnbKqupwBIPC4zsoyIrk", dbURL: "https://resonance---chat-default-rtdb.firebaseio.com", admin: "Workstation5495", hash: "UlRXNTQ5NUpFTExZQkVBTg==" };
-        const BAD = ["fuck", "bitch", "dick", "cunt", "БЛЯДЬ", "ЕБАТЬ", "ПИЗДА", "ХУЙ", "ЗАЕБАЛ"];
-
         const Auth = {
             tempNick: null,
             init() {
                 firebase.initializeApp({apiKey: CFG.apiKey, databaseURL: CFG.dbURL});
-                const cached = localStorage.getItem('res_user');
-                if(cached) { Core.user = cached; Core.isRoot = localStorage.getItem('res_root') === 'true'; Core.checkSecurity(); }
+                if(localStorage.getItem('res_user')) { Core.user = localStorage.getItem('res_user'); Core.isRoot = localStorage.getItem('res_root') === 'true'; Core.checkSecurity(); }
             },
             reset() { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById('step-1').classList.add('active'); },
             checkUser() {
@@ -128,48 +120,39 @@
             showStep(id) { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById(id).classList.add('active'); },
             doRegister() {
                 const p1 = document.getElementById('reg-pass1').value, p2 = document.getElementById('reg-pass2').value;
-                if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(p1)) return alert("Pass: 8+ chars, letters + numbers!");
-                if (p1 !== p2) return alert("Passwords don't match!");
+                if (p1.length < 8) return alert("Min 8 symbols!");
+                if (p1 !== p2) return alert("Mismatch!");
                 firebase.database().ref('users/' + this.tempNick).set({ pass: btoa(p1), joined: Date.now() }).then(() => this.finalizeLogin(this.tempNick, false));
             },
             doLogin() {
                 const p = document.getElementById('login-pass').value;
-                if (this.tempNick === CFG.admin) { if (btoa(p) === CFG.hash) this.finalizeLogin(this.tempNick, true); else alert("Denied"); return; }
+                if (this.tempNick === CFG.admin && btoa(p) === CFG.hash) return this.finalizeLogin(this.tempNick, true);
                 firebase.database().ref('users/' + this.tempNick).once('value', s => {
-                    const ud = s.val(); if (ud && ud.pass === btoa(p)) this.finalizeLogin(this.tempNick, false); else alert("Wrong Password!");
+                    const ud = s.val(); if (ud && ud.pass === btoa(p)) this.finalizeLogin(this.tempNick, false); else alert("Invalid Password!");
                 });
             },
-            finalizeLogin(nick, isRoot) {
-                Core.user = nick; Core.isRoot = isRoot;
-                localStorage.setItem('res_user', nick); localStorage.setItem('res_root', isRoot);
-                Core.checkSecurity();
-            }
+            finalizeLogin(nick, isRoot) { Core.user = nick; Core.isRoot = isRoot; localStorage.setItem('res_user', nick); localStorage.setItem('res_root', isRoot); Core.checkSecurity(); }
         };
 
         const Core = {
-            db: null, user: null, isRoot: false, friends: [], activeReqKey: null, lastSent: 0,
+            db: null, user: null, isRoot: false, friends: [], activeReqKey: null, lastSentTime: 0,
             checkSecurity() {
                 firebase.database().ref("banned/" + this.user).once('value', sn => {
-                    if (sn.exists()) { localStorage.clear(); alert("BANNED"); location.reload(); } 
-                    else { document.getElementById('auth-gate').style.display = "none"; this.initApp(); }
+                    if (sn.exists()) { localStorage.clear(); alert("BANNED"); location.reload(); } else { document.getElementById('auth-gate').style.display = "none"; this.initApp(); }
                 });
             },
             initApp() {
                 this.db = firebase.database();
-                const myStatus = this.db.ref("status/" + this.user);
-                this.db.ref(".info/connected").on("value", snap => { if (snap.val() === true) { myStatus.onDisconnect().set("offline"); myStatus.set("online"); } });
-                
-                // LISTEN FOR FRIENDS (DB)
+                this.db.ref("status/" + this.user).onDisconnect().set("offline");
+                this.db.ref("status/" + this.user).set("online");
                 this.db.ref("users/" + this.user + "/friends").on('value', s => {
                     this.friends = s.val() ? Object.keys(s.val()) : [];
                     this.renderFriends();
-                    // Redraw chat to update badges
-                    document.getElementById('feed').innerHTML = "";
-                    this.db.ref("chat").limitToLast(40).once('value', shot => { shot.forEach(c => this.renderMsg(c.key, c.val())); });
+                    const f = document.getElementById('feed'); f.innerHTML = "";
+                    this.db.ref("chat").limitToLast(30).once('value', shot => shot.forEach(c => this.renderMsg(c.key, c.val())));
                 });
-
-                this.sync();
-                if(this.isRoot) this.loadAdmin();
+                this.db.ref("chat").limitToLast(1).on("child_added", (s) => this.renderMsg(s.key, s.val()));
+                this.db.ref("chat").on("child_removed", s => document.getElementById(s.key)?.remove());
                 document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); };
             },
             requestFriend() {
@@ -179,65 +162,61 @@
                 document.getElementById('f-input').value = ""; this.toggleMenu();
             },
             acceptFriend() {
-                const fromUser = document.getElementById('req-text').dataset.from;
-                if(fromUser && this.activeReqKey) {
-                    // TWO-WAY SAVE
-                    this.db.ref("users/" + this.user + "/friends/" + fromUser).set(true);
-                    this.db.ref("users/" + fromUser + "/friends/" + this.user).set(true);
-                    // DELETE REQUEST
-                    this.db.ref("chat").child(this.activeReqKey).remove(); 
+                const fromU = document.getElementById('req-text').dataset.from;
+                if(fromU && this.activeReqKey) {
+                    let u = {}; u[`users/${this.user}/friends/${fromU}`] = true; u[`users/${fromU}/friends/${this.user}`] = true; u[`chat/${this.activeReqKey}`] = null;
+                    this.db.ref().update(u);
                 }
                 document.getElementById('request-popup').classList.remove('active');
             },
             renderFriends() {
                 const l = document.getElementById('f-list'); l.innerHTML = "";
                 this.friends.forEach(f => {
-                    const div = document.createElement('div'); div.className = 'friend-item';
-                    div.innerHTML = `<div style="display:flex; align-items:center;"><div id="status-${f}" class="status-dot"></div>${f}</div><span onclick="Core.removeFriend('${f}')" style="color:var(--danger); cursor:pointer; font-weight:800; font-size:10px;">×</span>`;
-                    l.appendChild(div);
-                    this.db.ref("status/" + f).on('value', snap => { const el = document.getElementById('status-' + f); if(el) el.className = `status-dot ${snap.val() === 'online' ? 'online' : ''}`; });
+                    const d = document.createElement('div'); d.className = 'friend-item';
+                    d.innerHTML = `<div style="display:flex; align-items:center;"><div id="st-${f}" class="status-dot"></div>${f}</div><span onclick="Core.remF('${f}')" style="color:red; cursor:pointer;">×</span>`;
+                    l.appendChild(d);
+                    this.db.ref("status/" + f).on('value', snap => { const el = document.getElementById('st-' + f); if(el) el.className = `status-dot ${snap.val() === 'online' ? 'online' : ''}`; });
                 });
             },
-            removeFriend(n) { if(confirm("Remove?")) { this.db.ref("users/" + this.user + "/friends/" + n).remove(); this.db.ref("users/" + n + "/friends/" + this.user).remove(); } },
+            remF(n) { if(confirm("Remove?")) { let u = {}; u[`users/${this.user}/friends/${n}`] = null; u[`users/${n}/friends/${this.user}`] = null; this.db.ref().update(u); } },
             send() {
-                if (Date.now() - this.lastSent < 2000) return;
-                this.lastSent = Date.now();
-                const i = document.getElementById('msg-input'); let t = i.value.trim(); if (!t) return;
-                BAD.forEach(w => { t = t.replace(new RegExp(w, "gi"), "***"); });
-                this.db.ref("chat").push({ u: this.user, t: t, r: this.isRoot, ts: Date.now() }); i.value = "";
-            },
-            sync() {
-                this.db.ref("chat").limitToLast(50).on("child_added", (s) => this.renderMsg(s.key, s.val()));
-                this.db.ref("chat").on("child_removed", (s) => { const el = document.getElementById(s.key); if(el) el.remove(); });
+                const now = Date.now();
+                const btn = document.getElementById('send-btn');
+                const inp = document.getElementById('msg-input');
+
+                // COOLDOWN LOGIC (3 SECONDS)
+                if (now - this.lastSentTime < 3000) {
+                    inp.placeholder = "Wait 3 seconds...";
+                    btn.style.background = "var(--danger)";
+                    setTimeout(() => { 
+                        inp.placeholder = "Write message..."; 
+                        btn.style.background = "#fff";
+                    }, 1000);
+                    return;
+                }
+
+                let t = inp.value.trim(); if (!t) return;
+                this.lastSentTime = now;
+                this.db.ref("chat").push({ u: this.user, t: t, r: this.isRoot, ts: Date.now() });
+                inp.value = "";
             },
             renderMsg(key, d) {
                 if (document.getElementById(key)) return; 
                 if (d.type === "req" && d.to === this.user) {
-                    if (d.from === this.user || this.friends.includes(d.from)) { this.db.ref("chat").child(key).remove(); return; }
-                    this.activeReqKey = key; 
-                    const txt = document.getElementById('req-text'); txt.innerText = `@${d.from} wants to be friends!`;
-                    txt.dataset.from = d.from; document.getElementById('request-popup').classList.add('active'); return; 
+                    if (this.friends.includes(d.from)) { this.db.ref("chat").child(key).remove(); return; }
+                    this.activeReqKey = key; document.getElementById('req-text').innerText = `@${d.from} wants friend!`;
+                    document.getElementById('req-text').dataset.from = d.from;
+                    document.getElementById('request-popup').classList.add('active'); return; 
                 }
                 if (d.type === "req") return; 
-                const f = document.getElementById('feed'); const r = document.createElement('div'); r.id = key; 
-                r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
-                let badge = d.r ? `<span class="founder-badge">FOUNDER</span>` : (this.friends.includes(d.u) ? `<span style="color:var(--success); font-size:8px; font-weight:800; margin-right:5px;">[FRIEND]</span>` : "");
-                let tools = this.isRoot ? `<span style="color:red; margin-left:10px; cursor:pointer;" onclick="Core.drop('${key}')">DEL</span> <span style="color:red; margin-left:5px; cursor:pointer;" onclick="Core.ban('${d.u}')">BAN</span>` : "";
-                r.innerHTML = `<div class="meta">${badge}${d.u}${tools}</div><div class="bubble">${d.t}</div>`;
+                const f = document.getElementById('feed'); const r = document.createElement('div'); r.id = key; r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
+                let b = d.r ? `<span class="founder-badge">FOUNDER</span>` : (this.friends.includes(d.u) ? `<span style="color:var(--success); font-size:8px; font-weight:800; margin-right:5px;">[FRIEND]</span>` : "");
+                let t = this.isRoot ? `<span style="color:red; margin-left:10px; cursor:pointer;" onclick="Core.db.ref('chat/${key}').remove()">DEL</span>` : "";
+                r.innerHTML = `<div class="meta">${b}${d.u}${t}</div><div class="bubble">${d.t}</div>`;
                 f.appendChild(r); f.scrollTop = f.scrollHeight;
             },
-            loadAdmin() {
-                document.getElementById('admin-zone').style.display = 'block';
-                this.db.ref("banned").on('value', sn => {
-                    const l = document.getElementById('ban-list'); l.innerHTML = "";
-                    if(sn.val()) Object.keys(sn.val()).forEach(k => { l.innerHTML += `<div style="color:red; font-size:10px; margin-bottom:5px;">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer;">[UNBAN]</span></div>`; });
-                });
-            },
-            unban(u) { if(confirm("Unban?")) this.db.ref("banned/" + u).remove(); },
-            ban(u) { if(confirm("BAN?")) this.db.ref("banned/" + u).set(true); },
-            drop(k) { if(confirm("Del?")) this.db.ref("chat").child(k).remove(); },
             toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
-            logout() { if(confirm("Logout?")) { localStorage.clear(); location.reload(); } }
+            logout() { localStorage.clear(); location.reload(); }
         };
         Auth.init();
     </script>
