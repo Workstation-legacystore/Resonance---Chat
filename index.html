@@ -4,65 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>RESONANCE | GLOBAL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #000; --card: #0a0a0a; --text: #fff; --border: 1px solid rgba(255,255,255,0.1); --danger: #ff453a; }
+        :root { --bg: #000; --card: #0a0a0a; --text: #fff; --border: 1px solid rgba(255,255,255,0.1); --danger: #ff453a; --success: #32d74b; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
-        body { height: 100dvh; background: #000; color: #fff; font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        body { height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
         
         #app-core { width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--card); position: relative; overflow: hidden; display: none; }
-        @media (min-width: 600px) { #app-core { max-width: 420px; height: 95vh; border: var(--border); border-radius: 28px; } }
+        @media (min-width: 600px) { #app-core { max-width: 420px; height: 95vh; border: var(--border); border-radius: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.8); } }
 
-        /* AUTH GATE - ТУТ ТЕПЕРЬ ПОРЯДОК */
-        #auth-gate { position: absolute; inset: 0; background: #000; z-index: 2000; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
-        .auth-inp { background: #111; border: 1px solid #222; color: #fff; padding: 18px; border-radius: 14px; margin-bottom: 12px; width: 100%; text-align: center; font-size: 16px; display: block; }
-        .auth-btn { background: #fff; color: #000; border: none; padding: 18px; border-radius: 14px; font-weight: 800; width: 100%; cursor: pointer; transition: 0.2s; }
-        
-        /* КЛАСС ДЛЯ СКРЫТИЯ */
-        .hidden { display: none !important; }
+        /* HEADER */
+        header { height: 70px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #161616; z-index: 10; background: rgba(10,10,10,0.98); }
+        .brand { font-family: 'Outfit'; font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
 
-        header { height: 60px; padding: 0 20px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #111; }
-        #feed { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
-        .msg-wrap { display: flex; flex-direction: column; max-width: 85%; }
+        /* SIDEBAR */
+        #sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: 280px; background: #080808; border-right: 1px solid #222; z-index: 500; transform: translateX(-100%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px; display: flex; flex-direction: column; }
+        #sidebar.open { transform: translateX(0); box-shadow: 100px 0 200px rgba(0,0,0,0.9); }
+        .logout-btn { margin-top: auto; background: rgba(255, 69, 58, 0.05); color: var(--danger); border: 1px solid rgba(255, 69, 58, 0.1); padding: 15px; border-radius: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* FEED */
+        #feed { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
+        .msg-wrap { display: flex; flex-direction: column; max-width: 85%; animation: slideIn 0.3s ease; }
         .msg-wrap.mine { align-self: flex-end; align-items: flex-end; }
-        .bubble { padding: 12px 16px; font-size: 15px; border-radius: 18px; background: #1a1a1a; }
-        .msg-wrap.mine .bubble { background: #fff; color: #000; }
         
-        .footer { height: 70px; padding: 0 15px; display: flex; align-items: center; gap: 10px; background: #050505; }
-        .msg-input { flex: 1; background: #111; border: none; padding: 0 15px; border-radius: 20px; color: #fff; height: 44px; }
-        .send-btn { width: 44px; height: 44px; border-radius: 50%; background: #fff; color: #000; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .bubble { padding: 14px 18px; font-size: 15px; border-radius: 22px; line-height: 1.4; word-wrap: break-word; }
+        .msg-wrap.mine .bubble { background: #fff; color: #000; border-radius: 22px 22px 4px 22px; }
+        .msg-wrap:not(.mine) .bubble { background: #1a1a1a; color: #fff; border-radius: 22px 22px 22px 4px; border: 1px solid rgba(255,255,255,0.03); }
+        
+        .meta { font-size: 10px; color: #555; margin-bottom: 5px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+        
+        /* FOUNDER GLOW */
+        .founder-badge { 
+            background: linear-gradient(90deg, #ff453a, #ff9f0a); color: #fff; padding: 2px 6px; 
+            border-radius: 4px; font-size: 8px; font-weight: 900; 
+            box-shadow: 0 0 15px rgba(255, 69, 58, 0.4); 
+            animation: pulseGlow 2s infinite;
+        }
+
+        .admin-tools { display: flex; gap: 8px; opacity: 0.6; transition: 0.2s; }
+        .admin-tools:hover { opacity: 1; }
+        .adm-icon { width: 14px; height: 14px; cursor: pointer; color: var(--danger); }
+
+        /* AUTH GATE */
+        #auth-gate { position: absolute; inset: 0; background: #000; z-index: 2000; display: flex; flex-direction: column; justify-content: center; padding: 40px; }
+        .auth-step { display: none; width: 100%; animation: popIn 0.3s; }
+        .auth-step.active { display: block; }
+        
+        .auth-inp { background: #111; border: 1px solid #222; color: #fff; padding: 20px; border-radius: 16px; margin-bottom: 12px; width: 100%; font-size: 16px; text-align: center; }
+        .auth-btn { background: #fff; color: #000; border: none; padding: 20px; border-radius: 16px; font-weight: 800; width: 100%; cursor: pointer; }
+
+        .footer { height: 80px; padding: 0 15px; display: flex; align-items: center; gap: 10px; border-top: 1px solid #161616; background: #0a0a0a; }
+        .msg-input { flex: 1; background: #111; border: 1px solid #222; padding: 0 20px; border-radius: 25px; color: #fff; height: 50px; font-size: 16px; }
+        .send-btn { width: 50px; height: 50px; border-radius: 50%; background: #fff; color: #000; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+
+        @keyframes pulseGlow { 0% { opacity: 0.8; } 50% { opacity: 1; box-shadow: 0 0 20px rgba(255, 69, 58, 0.6); } 100% { opacity: 0.8; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } }
+        @keyframes popIn { from { opacity: 0; transform: scale(0.95); } }
+        ::-webkit-scrollbar { width: 0; }
     </style>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
     <div id="auth-gate">
-        <h1 style="font-family:'Outfit'; font-size:42px; text-align:center; margin-bottom:40px; letter-spacing:-2px;">RESONANCE</h1>
-        
-        <div id="step-1">
+        <div style="text-align:center; margin-bottom:50px;">
+            <h1 style="font-family:'Outfit'; font-size:48px; margin:0; letter-spacing:-2px;">RESONANCE</h1>
+            <div style="color:#555; font-size:10px; letter-spacing:2px; font-weight:700; margin-top:10px;">SECURE NODE v3.6.0</div>
+        </div>
+
+        <div id="step-1" class="auth-step active">
             <input type="text" id="nick-field" class="auth-inp" placeholder="Identity Name">
             <button onclick="Auth.checkUser()" class="auth-btn">VERIFY</button>
         </div>
 
-        <div id="step-login" class="hidden">
+        <div id="step-login" class="auth-step">
             <input type="password" id="login-pass" class="auth-inp" placeholder="Password">
-            <button onclick="Auth.doLogin()" class="auth-btn">LINK SYSTEM</button>
-            <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:15px;">Back</button>
+            <button onclick="Auth.doLogin()" class="auth-btn">ACCESS SYSTEM</button>
+            <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:10px;">Back</button>
         </div>
 
-        <div id="step-register" class="hidden">
-            <input type="password" id="reg-pass" class="auth-inp" placeholder="Create Password (min 8)">
+        <div id="step-register" class="auth-step">
+            <input type="password" id="reg-pass1" class="auth-inp" placeholder="Create Password (min 8)">
+            <input type="password" id="reg-pass2" class="auth-inp" placeholder="Confirm Password">
             <button onclick="Auth.doRegister()" class="auth-btn">INITIALIZE</button>
-            <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:15px;">Back</button>
+            <button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:10px;">Back</button>
         </div>
     </div>
 
     <div id="app-core">
-        <header><div style="font-family:'Outfit'; font-weight:800;">RESONANCE GLOBAL</div></header>
+        <div id="sidebar">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                <div style="font-family:'Outfit'; font-size:24px; font-weight:800;">MENU</div>
+                <button onclick="Core.toggleMenu()" style="background:none; border:none; color:#666; font-size:28px; cursor:pointer;">&times;</button>
+            </div>
+            <div id="admin-zone" style="display:none; padding:15px; border:1px solid var(--danger); border-radius:16px; background:rgba(255,69,58,0.05); margin-bottom: 20px;">
+                <div style="font-size:10px; color:var(--danger); font-weight:800; margin-bottom:10px;">BANNED</div>
+                <div id="ban-list"></div>
+            </div>
+            <button onclick="Core.logout()" class="logout-btn">DISCONNECT</button>
+        </div>
+
+        <header>
+            <button onclick="Core.toggleMenu()" style="background:none; border:none; color:#fff; cursor:pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            <div class="brand">RESONANCE</div>
+            <div id="conn-status" style="width:8px; height:8px; background:#32d74b; border-radius:50%; box-shadow:0 0 10px #32d74b;"></div>
+        </header>
+
         <div id="feed"></div>
+
         <div class="footer">
-            <input type="text" id="msg-input" class="msg-input" placeholder="...">
-            <button onclick="Core.send()" class="send-btn">▲</button>
+            <input type="text" id="msg-input" class="msg-input" placeholder="Broadcast..." autocomplete="off">
+            <button onclick="Core.send()" class="send-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></button>
         </div>
     </div>
 
@@ -73,65 +125,100 @@
             t: null,
             init() { 
                 firebase.initializeApp({apiKey: CFG.k, databaseURL: CFG.d}); 
-                const saved = localStorage.getItem('res_user');
-                if(saved) this.finalize(saved, localStorage.getItem('res_root') === 'true');
+                const u = localStorage.getItem('res_user');
+                if(u) {
+                    Core.user = u; Core.isRoot = localStorage.getItem('res_root') === 'true';
+                    firebase.database().ref("banned/" + u).once('value', s => {
+                        if (s.exists()) { this.fail(); } else { this.ok(); }
+                    });
+                }
             },
             reset() { 
-                document.getElementById('step-1').classList.remove('hidden');
-                document.getElementById('step-login').classList.add('hidden');
-                document.getElementById('step-register').classList.add('hidden');
+                document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); 
+                document.getElementById('step-1').classList.add('active'); 
             },
-            checkUser() {
-                const n = document.getElementById('nick-field').value.trim();
-                if (n.length < 3) return;
-                this.t = n;
-                firebase.database().ref('users/' + n).once('value', s => {
-                    document.getElementById('step-1').classList.add('hidden');
-                    if (s.exists()) document.getElementById('step-login').classList.remove('hidden');
-                    else document.getElementById('step-register').classList.remove('hidden');
+            checkUser() { 
+                const n = document.getElementById('nick-field').value.trim(); 
+                if (n.length < 3) return alert("Min 3 chars");
+                // PROVERKA BANA
+                firebase.database().ref("banned/" + n).once('value', sn => {
+                    if(sn.exists()) return alert("BANNED");
+                    this.t = n;
+                    firebase.database().ref('users/' + n).once('value', s => { 
+                        if (s.exists()) this.show('step-login'); 
+                        else this.show('step-register'); 
+                    });
                 });
             },
-            doLogin() {
-                const p = document.getElementById('login-pass').value;
-                if (this.t === CFG.a && btoa(p) === CFG.h) return this.finalize(this.t, true);
-                firebase.database().ref('users/' + this.t).once('value', s => {
-                    if (s.val() && s.val().pass === btoa(p)) this.finalize(this.t, false);
-                    else alert("WRONG");
-                });
+            show(id) { 
+                document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); 
+                document.getElementById(id).classList.add('active'); 
             },
-            doRegister() {
-                const p = document.getElementById('reg-pass').value;
-                if (p.length < 8 || this.t === CFG.a) return alert("ERROR");
-                firebase.database().ref('users/' + this.t).set({ pass: btoa(p) }).then(() => this.finalize(this.t, false));
+            doRegister() { 
+                const p1 = document.getElementById('reg-pass1').value, p2 = document.getElementById('reg-pass2').value; 
+                if (p1.length < 8 || p1 !== p2) return alert("Check pass!"); 
+                firebase.database().ref('users/' + this.t).set({ pass: btoa(p1), ts: Date.now() }).then(() => this.fin(this.t, false)); 
             },
-            finalize(n, r) {
-                localStorage.setItem('res_user', n);
-                localStorage.setItem('res_root', r);
-                Core.user = n; Core.isRoot = r;
-                document.getElementById('auth-gate').style.display = 'none';
-                document.getElementById('app-core').style.display = 'flex';
-                Core.run();
-            }
+            doLogin() { 
+                const p = document.getElementById('login-pass').value; 
+                if (this.t === CFG.a && btoa(p) === CFG.h) return this.fin(this.t, true);
+                firebase.database().ref('users/' + this.t).once('value', s => { 
+                    if (s.val() && s.val().pass === btoa(p)) this.fin(this.t, false); 
+                    else alert("Wrong Pass"); 
+                }); 
+            },
+            fin(n, r) { 
+                localStorage.setItem('res_user', n); localStorage.setItem('res_root', r); 
+                Core.user = n; Core.isRoot = r; 
+                this.ok(); 
+            },
+            ok() { 
+                document.getElementById('auth-gate').style.display = "none"; 
+                document.getElementById('app-core').style.display = "flex"; 
+                Core.mon(); Core.run(); 
+            },
+            fail() { localStorage.clear(); location.reload(); }
         };
 
         const Core = {
-            user: null, isRoot: false,
-            run() {
-                this.db = firebase.database();
-                this.db.ref("chat").limitToLast(50).on("child_added", s => this.draw(s.key, s.val()));
-                document.getElementById('msg-input').onkeypress = (e) => { if(e.key==='Enter') this.send(); };
+            user: null, isRoot: false, last: 0,
+            mon() { firebase.database().ref("banned/" + this.user).on('value', s => { if (s.exists()) Auth.fail(); }); },
+            run() { 
+                this.db = firebase.database(); 
+                this.db.ref("chat").limitToLast(50).on("child_added", (s) => this.draw(s.key, s.val())); 
+                this.db.ref("chat").on("child_removed", s => document.getElementById(s.key)?.remove());
+                if(this.isRoot) this.adm(); 
+                document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); }; 
             },
-            send() {
-                let t = document.getElementById('msg-input').value.trim(); if(!t) return;
-                this.db.ref("chat").push({ u: this.user, t: t, r: this.isRoot });
+            send() { 
+                const now = Date.now(); if (now - this.last < 2000) return; 
+                let t = document.getElementById('msg-input').value.trim(); if (!t) return; 
+                this.last = now; 
+                this.db.ref("chat").push({ u: this.user, t: t, r: this.isRoot, ts: now }); 
                 document.getElementById('msg-input').value = "";
             },
             draw(k, d) {
-                const f = document.getElementById('feed'), r = document.createElement('div');
-                r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
-                r.innerHTML = `<div style="font-size:9px; color:#444;">${d.u}</div><div class="bubble">${d.t}</div>`;
+                if(document.getElementById(k)) return;
+                const f = document.getElementById('feed'), r = document.createElement('div'); 
+                r.id = k; r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
+                let b = d.r ? `<span class="founder-badge">FOUNDER</span>` : "";
+                let tools = (this.isRoot && d.u !== this.user) ? `<div class="admin-tools"><svg onclick="Core.db.ref('chat/${k}').remove()" class="adm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg><svg onclick="Core.ban('${d.u}')" class="adm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg></div>` : "";
+                r.innerHTML = `<div class="meta">${b}${d.u}${tools}</div><div class="bubble">${d.t}</div>`;
                 f.appendChild(r); f.scrollTop = f.scrollHeight;
-            }
+            },
+            adm() { 
+                document.getElementById('admin-zone').style.display = 'block'; 
+                this.db.ref("banned").on('value', s => { 
+                    const l = document.getElementById('ban-list'); l.innerHTML = ""; 
+                    if(s.val()) Object.keys(s.val()).forEach(k => { 
+                        l.innerHTML += `<div style="color:red; font-size:10px; display:flex; justify-content:space-between; margin-bottom:5px;">${k} <span onclick="Core.ub('${k}')" style="color:#fff; cursor:pointer;">UNBAN</span></div>`; 
+                    }); 
+                }); 
+            },
+            ub(u) { if(confirm("Unban?")) this.db.ref("banned/" + u).remove(); },
+            ban(u) { if(confirm("BAN?")) this.db.ref("banned/" + u).set(true); },
+            toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
+            logout() { if(confirm("Disconnect?")) Auth.fail(); }
         };
         Auth.init();
     </script>
