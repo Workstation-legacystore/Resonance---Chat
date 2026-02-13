@@ -9,7 +9,7 @@
         :root { --bg: #000; --card: #0a0a0a; --text: #fff; --border: 1px solid rgba(255,255,255,0.1); --danger: #ff453a; --success: #32d74b; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; -webkit-tap-highlight-color: transparent; }
         body { height: 100dvh; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        #app-core { width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--card); position: relative; overflow: hidden; }
+        #app-core { width: 100%; height: 100%; display: flex; flex-direction: column; background: var(--card); position: relative; overflow: hidden; display: none; } /* Скрыто до проверки входа */
         @media (min-width: 600px) { #app-core { max-width: 420px; height: 95vh; border: var(--border); border-radius: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); } }
 
         header { height: 70px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #161616; z-index: 10; background: rgba(10,10,10,0.95); }
@@ -17,7 +17,6 @@
 
         #sidebar { position: absolute; left: 0; top: 0; bottom: 0; width: 280px; background: #080808; border-right: 1px solid #222; z-index: 500; transform: translateX(-100%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); padding: 30px; display: flex; flex-direction: column; }
         #sidebar.open { transform: translateX(0); box-shadow: 100px 0 200px rgba(0,0,0,0.7); }
-        .sec-badge { font-size: 10px; color: var(--success); border: 1px solid rgba(50, 215, 75, 0.3); padding: 8px; border-radius: 8px; text-align: center; margin-bottom: 20px; background: rgba(50, 215, 75, 0.05); font-weight: 700; letter-spacing: 1px; }
 
         #feed { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
         .msg-wrap { display: flex; flex-direction: column; max-width: 85%; animation: slideIn 0.3s ease; }
@@ -49,19 +48,20 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 </head>
 <body>
+    <div id="auth-gate">
+        <div style="text-align:center; margin-bottom:50px;"><h1 style="font-family:'Outfit'; font-size:48px; margin:0; letter-spacing:-2px;">RESONANCE</h1><div style="color:#555; font-size:10px; letter-spacing:2px; font-weight:700; margin-top:10px;">SECURE GLOBAL NETWORK</div></div>
+        <div id="step-1" class="auth-step active"><input type="text" id="nick-field" class="auth-inp" placeholder="Identity Name"><button onclick="Auth.checkUser()" class="auth-btn">VERIFY IDENTITY</button></div>
+        <div id="step-login" class="auth-step"><input type="password" id="login-pass" class="auth-inp" placeholder="Password"><button onclick="Auth.doLogin()" class="auth-btn">ACCESS SYSTEM</button><button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:15px;">Cancel</button></div>
+        <div id="step-register" class="auth-step"><input type="password" id="reg-pass1" class="auth-inp" placeholder="Create Password (min 8)"><input type="password" id="reg-pass2" class="auth-inp" placeholder="Confirm Password"><button onclick="Auth.doRegister()" class="auth-btn">INITIALIZE</button><button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:15px;">Cancel</button></div>
+    </div>
+
     <div id="app-core">
         <div id="sidebar">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;"><div style="font-family:'Outfit'; font-size:24px; font-weight:800;">MENU</div><button onclick="Core.toggleMenu()" style="background:none; border:none; color:#666; font-size:28px; cursor:pointer;">&times;</button></div>
-            <div class="sec-badge">✓ SECURE CONNECTION</div>
+            
             <div id="admin-zone" style="display:none; padding:15px; border:1px solid var(--danger); border-radius:16px; background:rgba(255,69,58,0.05); margin-bottom: 20px;"><div style="font-size:10px; color:var(--danger); font-weight:800; margin-bottom:10px;">BANNED USERS</div><div id="ban-list"></div></div>
+            
             <button onclick="Core.logout()" class="logout-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>DISCONNECT</button>
-        </div>
-
-        <div id="auth-gate">
-            <div style="text-align:center; margin-bottom:50px;"><h1 style="font-family:'Outfit'; font-size:48px; margin:0; letter-spacing:-2px;">RESONANCE</h1><div style="color:#555; font-size:10px; letter-spacing:2px; font-weight:700; margin-top:10px;">SECURE GLOBAL NETWORK</div></div>
-            <div id="step-1" class="auth-step active"><input type="text" id="nick-field" class="auth-inp" placeholder="Identity Name"><button onclick="Auth.checkUser()" class="auth-btn">VERIFY IDENTITY</button></div>
-            <div id="step-login" class="auth-step"><input type="password" id="login-pass" class="auth-inp" placeholder="Password"><button onclick="Auth.doLogin()" class="auth-btn">ACCESS SYSTEM</button><button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:15px;">Cancel</button></div>
-            <div id="step-register" class="auth-step"><input type="password" id="reg-pass1" class="auth-inp" placeholder="Create Password (min 8)"><input type="password" id="reg-pass2" class="auth-inp" placeholder="Confirm Password"><button onclick="Auth.doRegister()" class="auth-btn">INITIALIZE</button><button onclick="Auth.reset()" style="color:#444; background:none; border:none; width:100%; margin-top:15px;">Cancel</button></div>
         </div>
 
         <header><button onclick="Core.toggleMenu()" style="background:none; border:none; color:#fff; cursor:pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button><div style="font-family:'Outfit'; font-weight:800; font-size:20px;">RESONANCE</div><div id="conn-status" style="width:8px; height:8px; background:#32d74b; border-radius:50%; box-shadow:0 0 10px #32d74b;"></div></header>
@@ -71,30 +71,63 @@
 
     <script>
         const CFG = { apiKey: "AIzaSyAmZnFT9sYDL7XFnbKqupwBIPC4zsoyIrk", dbURL: "https://resonance---chat-default-rtdb.firebaseio.com", admin: "Workstation5495", hash: "UlRXNTQ5NUpFTExZQkVBTg==" };
+        
         const Auth = {
             tempNick: null,
-            init() { firebase.initializeApp({apiKey: CFG.apiKey, databaseURL: CFG.dbURL}); if(localStorage.getItem('res_user')) { Core.user = localStorage.getItem('res_user'); Core.isRoot = localStorage.getItem('res_root') === 'true'; Core.monitorBan(); Core.initApp(); } },
+            init() { 
+                firebase.initializeApp({apiKey: CFG.apiKey, databaseURL: CFG.dbURL}); 
+                // AUTO LOGIN CHECK
+                const savedUser = localStorage.getItem('res_user');
+                if(savedUser) {
+                    Core.user = savedUser;
+                    Core.isRoot = localStorage.getItem('res_root') === 'true';
+                    // Проверяем бан перед тем как пустить
+                    firebase.database().ref("banned/" + Core.user).once('value', sn => {
+                        if (sn.exists()) { this.logoutForce(); }
+                        else { this.enterApp(); }
+                    });
+                }
+            },
             reset() { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById('step-1').classList.add('active'); },
             checkUser() { const n = document.getElementById('nick-field').value.trim(); if (n.length < 3) return alert("Min 3 chars"); this.tempNick = n; firebase.database().ref('users/' + n).once('value', s => { if (s.exists()) this.showStep('step-login'); else this.showStep('step-register'); }); },
             showStep(id) { document.querySelectorAll('.auth-step').forEach(e => e.classList.remove('active')); document.getElementById(id).classList.add('active'); },
             doRegister() { const p1 = document.getElementById('reg-pass1').value, p2 = document.getElementById('reg-pass2').value; if (p1.length < 8 || p1 !== p2) return alert("Check pass!"); firebase.database().ref('users/' + this.tempNick).set({ pass: btoa(p1), joined: Date.now() }).then(() => this.finalizeLogin(this.tempNick, false)); },
             doLogin() { const p = document.getElementById('login-pass').value; if (this.tempNick === CFG.admin && btoa(p) === CFG.hash) return this.finalizeLogin(this.tempNick, true); firebase.database().ref('users/' + this.tempNick).once('value', s => { if (s.val() && s.val().pass === btoa(p)) this.finalizeLogin(this.tempNick, false); else alert("Wrong Pass"); }); },
-            finalizeLogin(nick, isRoot) { Core.user = nick; Core.isRoot = isRoot; localStorage.setItem('res_user', nick); localStorage.setItem('res_root', isRoot); Core.monitorBan(); document.getElementById('auth-gate').style.display = "none"; Core.initApp(); }
+            finalizeLogin(nick, isRoot) { Core.user = nick; Core.isRoot = isRoot; localStorage.setItem('res_user', nick); localStorage.setItem('res_root', isRoot); this.enterApp(); },
+            enterApp() {
+                document.getElementById('auth-gate').style.display = "none";
+                document.getElementById('app-core').style.display = "flex";
+                Core.monitorBan();
+                Core.initApp();
+            },
+            logoutForce() { localStorage.clear(); location.reload(); }
         };
+
         const Core = {
             db: null, user: null, isRoot: false, lastSent: 0,
-            monitorBan() { firebase.database().ref("banned/" + this.user).on('value', sn => { if (sn.exists()) { localStorage.clear(); location.reload(); } }); },
-            initApp() { this.db = firebase.database(); this.db.ref("chat").limitToLast(50).on("child_added", (s) => this.renderMsg(s.key, s.val())); this.db.ref("chat").on("child_removed", s => document.getElementById(s.key)?.remove()); if(this.isRoot) this.loadAdmin(); document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); }; },
+            monitorBan() { 
+                // REAL-TIME BAN CHECK (THE KILL SWITCH)
+                firebase.database().ref("banned/" + this.user).on('value', sn => { 
+                    if (sn.exists()) { localStorage.clear(); location.reload(); } 
+                }); 
+            },
+            initApp() { 
+                this.db = firebase.database(); 
+                this.db.ref("chat").limitToLast(50).on("child_added", (s) => this.renderMsg(s.key, s.val())); 
+                this.db.ref("chat").on("child_removed", s => document.getElementById(s.key)?.remove()); 
+                if(this.isRoot) this.loadAdmin(); 
+                document.getElementById('msg-input').onkeypress = (e) => { if (e.key === 'Enter') this.send(); }; 
+            },
             send() { const now = Date.now(); if (now - this.lastSent < 3000) return; let t = document.getElementById('msg-input').value.trim(); if (!t) return; this.lastSent = now; this.db.ref("chat").push({ u: this.user, t: t, r: this.isRoot, ts: now }); document.getElementById('msg-input').value = ""; },
             renderMsg(key, d) {
                 if (document.getElementById(key)) return;
                 const f = document.getElementById('feed'); const r = document.createElement('div'); r.id = key; r.className = `msg-wrap ${d.u === this.user ? 'mine' : ''}`;
                 let b = d.r ? `<span class="founder-badge">FOUNDER</span>` : "";
-                let tools = this.isRoot ? `<div class="admin-tools"><svg onclick="Core.db.ref('chat/${key}').remove()" class="adm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg><svg onclick="Core.ban('${d.u}')" class="adm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg></div>` : "";
+                let tools = this.isRoot ? `<div class="admin-tools"><svg onclick="Core.db.ref('chat/${key}').remove()" class="adm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2-2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg><svg onclick="Core.ban('${d.u}')" class="adm-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg></div>` : "";
                 r.innerHTML = `<div class="meta">${b}${d.u}${tools}</div><div class="bubble">${d.t}</div>`;
                 f.appendChild(r); f.scrollTop = f.scrollHeight;
             },
-            loadAdmin() { document.getElementById('admin-zone').style.display = 'block'; this.db.ref("banned").on('value', sn => { const l = document.getElementById('ban-list'); l.innerHTML = ""; if(sn.val()) Object.keys(sn.val()).forEach(k => { l.innerHTML += `<div style="color:red; font-size:10px; display:flex; justify-content:space-between;">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer;">UNBAN</span></div>`; }); }); },
+            loadAdmin() { document.getElementById('admin-zone').style.display = 'block'; this.db.ref("banned").on('value', sn => { const l = document.getElementById('ban-list'); l.innerHTML = ""; if(sn.val()) Object.keys(sn.val()).forEach(k => { l.innerHTML += `<div style="color:red; font-size:10px; display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">${k} <span onclick="Core.unban('${k}')" style="color:#fff; cursor:pointer; background:#333; padding:2px 6px; border-radius:4px;">UNBAN</span></div>`; }); }); },
             unban(u) { if(confirm("Unban?")) this.db.ref("banned/" + u).remove(); },
             ban(u) { if(confirm("BAN?")) this.db.ref("banned/" + u).set(true); },
             toggleMenu() { document.getElementById('sidebar').classList.toggle('open'); },
