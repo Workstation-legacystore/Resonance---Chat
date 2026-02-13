@@ -48,9 +48,13 @@
         .admin-tools { display: flex; gap: 10px; margin-left: 8px; opacity: 0.6; }
         .adm-icon { width: 14px; height: 14px; cursor: pointer; color: var(--danger); fill: none; stroke: currentColor; stroke-width: 2.5; }
 
+        /* SPAM FILTER STATUS */
+        #spam-status { font-size: 10px; color: var(--danger); position: absolute; bottom: 85px; right: 25px; font-weight: 800; display: none; letter-spacing: 1px; animation: fadeIn 0.3s; }
+
         .footer { height: 80px; padding: 0 15px; display: flex; align-items: center; gap: 10px; border-top: 1px solid #161616; background: #0a0a0a; position: relative; }
         .msg-input { flex: 1; background: #111; border: 1px solid #222; padding: 0 20px; border-radius: 24px; color: #fff; height: 50px; font-size: 16px; }
-        .send-btn { width: 50px; height: 50px; border-radius: 50%; background: #fff; color: #000; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .send-btn { width: 50px; height: 50px; border-radius: 50%; background: #fff; color: #000; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .send-btn:disabled { background: #222; opacity: 0.5; }
 
         @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } }
@@ -62,7 +66,7 @@
 </head>
 <body>
     <div id="auth-gate">
-        <div style="text-align:center; margin-bottom:50px;"><h1 style="font-family:'Outfit'; font-size:48px; margin:0;">RESONANCE</h1><div style="color:#444; font-size:10px; font-weight:700; margin-top:10px;">Always in touch v3.8.6</div></div>
+        <div style="text-align:center; margin-bottom:50px;"><h1 style="font-family:'Outfit'; font-size:48px; margin:0;">RESONANCE</h1><div style="color:#444; font-size:10px; font-weight:700; margin-top:10px;">Always in touch v3.8.7</div></div>
         <div id="st-1" class="auth-step active"><input type="text" id="n-f" class="auth-inp" placeholder="Identity Name"><button onclick="Auth.check()" class="auth-btn">VERIFY</button></div>
         <div id="st-l" class="auth-step"><input type="password" id="l-p" class="auth-inp" placeholder="Password"><button onclick="Auth.login()" class="auth-btn">LOGIN</button></div>
         <div id="st-r" class="auth-step"><input type="password" id="r-p1" class="auth-inp" placeholder="New Pass (8+)"><input type="password" id="r-p2" class="auth-inp" placeholder="Confirm Pass"><button onclick="Auth.reg()" class="auth-btn">SIGN-UP</button></div>
@@ -79,6 +83,7 @@
         </div>
         <header><button onclick="Core.toggleMenu()" style="background:none; border:none; color:#fff; cursor:pointer;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button><div class="brand">RESONANCE</div><div style="width:8px; height:8px; background:#32d74b; border-radius:50%;"></div></header>
         <div id="feed"></div>
+        <div id="spam-status">WAITING FOR NODE...</div>
         <div class="footer"><input type="text" id="msg-input" class="msg-input" placeholder="Broadcast..."><button id="send-btn" onclick="Core.send()" class="send-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg></button></div>
     </div>
 
@@ -147,8 +152,10 @@
                 this.last = now;
                 firebase.database().ref("chat").push({ u: this.user, t: t, r: this.isRoot });
                 document.getElementById('msg-input').value = "";
-                const b = document.getElementById('send-btn'); b.disabled = true;
-                setTimeout(() => b.disabled = false, 3000);
+                // Visual Spam cooldown
+                const b = document.getElementById('send-btn'), s = document.getElementById('spam-status');
+                b.disabled = true; s.style.display = 'block';
+                setTimeout(() => { b.disabled = false; s.style.display = 'none'; }, 3000);
             },
             draw(k, d) {
                 const f = document.getElementById('feed'), r = document.createElement('div');
